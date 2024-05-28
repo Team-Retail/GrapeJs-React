@@ -1,25 +1,21 @@
-import * as React from "react";
 import { useEditor } from "@grapesjs/react";
 import {
   mdiArrowULeftTop,
   mdiArrowURightTop,
-  mdiBorderRadius,
   mdiFullscreen,
-  mdiXml,
-  mdiUpload,
   mdiLoading,
+  mdiUpload,
 } from "@mdi/js";
 import Icon from "@mdi/react";
+import Box from "@mui/material/Box";
+import CryptoJS from "crypto-js";
+import * as React from "react";
 import { useEffect, useState } from "react";
 import { BTN_CLS, MAIN_BORDER_COLOR, cx } from "./common.ts";
-import AWS from "aws-sdk";
-import CryptoJS from "crypto-js";
-import Box from "@mui/material/Box";
 
 import {
-  S3Client,
   PutObjectCommand,
-  GetObjectCommand,
+  S3Client,
 } from "@aws-sdk/client-s3";
 
 import Modal from "@mui/material/Modal";
@@ -32,7 +28,7 @@ interface CommandButton {
 }
 
 const style = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -47,7 +43,6 @@ export default function TopbarButtons({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const editor = useEditor();
-  const [, setUpdateCounter] = useState(0);
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
   const { UndoManager, Commands } = editor;
@@ -61,21 +56,19 @@ export default function TopbarButtons({
 
   useEffect(() => {
     const cmdEvent = "run stop";
-    const updateEvent = "update";
-    const updateCounter = () => setUpdateCounter((value) => value + 1);
     const onCommand = (id: string) => {
       console.log("command id:", id);
-      cmdButtons.find((btn) => btn.id === id) && updateCounter();
+      cmdButtons.find((btn) => btn.id === id)
     };
     editor.on(cmdEvent, onCommand);
-    editor.on(updateEvent, updateCounter);
+    // editor.on(updateEvent);
 
     // editor.select("Mobile portrait")
     // editor.select
 
     return () => {
       editor.off(cmdEvent, onCommand);
-      editor.off(updateEvent, updateCounter);
+      // editor.off(updateEvent);
     };
   }, []);
 
