@@ -1,13 +1,13 @@
-import * as React from 'react';
-import { AssetsResultProps, useEditor } from '@grapesjs/react';
-import { mdiClose } from '@mdi/js';
-import Icon from '@mdi/react';
-import type { Asset } from 'grapesjs';
-import { BTN_CLS } from './common.ts';
+import * as React from "react";
+import { AssetsResultProps, useEditor } from "@grapesjs/react";
+import { mdiClose } from "@mdi/js";
+import Icon from "@mdi/react";
+import type { Asset } from "grapesjs";
+import { BTN_CLS } from "./common.ts";
 
 export type CustomAssetManagerProps = Pick<
   AssetsResultProps,
-  'assets' | 'close' | 'select'
+  "assets" | "close" | "select"
 >;
 
 export default function CustomAssetManager({

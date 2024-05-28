@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   BlocksProvider,
   LayersProvider,
@@ -6,28 +6,28 @@ import {
   SelectorsProvider,
   StylesProvider,
   TraitsProvider,
-} from '@grapesjs/react';
+} from "@grapesjs/react";
 import {
   mdiBrush,
   mdiLayers,
   mdiViewGridPlus,
   mdiTextBoxMultiple,
   mdiCog,
-} from '@mdi/js';
-import Icon from '@mdi/react';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
-import { useState } from 'react';
-import CustomBlockManager from './CustomBlockManager.tsx';
-import { MAIN_BORDER_COLOR, cx } from './common.ts';
-import CustomPageManager from './CustomPageManager.tsx';
-import CustomLayerManager from './CustomLayerManager.tsx';
-import CustomSelectorManager from './CustomSelectorManager.tsx';
-import CustomStyleManager from './CustomStyleManager.tsx';
-import CustomTraitManager from './CustomTraitManager.tsx';
+} from "@mdi/js";
+import Icon from "@mdi/react";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import { useState } from "react";
+import CustomBlockManager from "./CustomBlockManager.tsx";
+import { MAIN_BORDER_COLOR, cx } from "./common.ts";
+import CustomPageManager from "./CustomPageManager.tsx";
+import CustomLayerManager from "./CustomLayerManager.tsx";
+import CustomSelectorManager from "./CustomSelectorManager.tsx";
+import CustomStyleManager from "./CustomStyleManager.tsx";
+import CustomTraitManager from "./CustomTraitManager.tsx";
 
 const defaultTabProps = {
-  className: '!min-w-0',
+  className: "!min-w-0",
 };
 
 export default function RightSidebar({
@@ -36,7 +36,9 @@ export default function RightSidebar({
   const [selectedTab, setSelectedTab] = useState(0);
 
   return (
-    <div className={cx('gjs-right-sidebar bg-[#407BFF] flex flex-col', className)}>
+    <div
+      className={cx("gjs-right-sidebar bg-[#407BFF] flex flex-col", className)}
+    >
       <Tabs
         value={selectedTab}
         onChange={(_, v) => setSelectedTab(v)}
@@ -55,7 +57,7 @@ export default function RightSidebar({
         />
       </Tabs>
       <div
-        className={cx('overflow-y-auto flex-grow border-t', MAIN_BORDER_COLOR)}
+        className={cx("overflow-y-auto flex-grow border-t", MAIN_BORDER_COLOR)}
       >
         {selectedTab === 0 && (
           <>

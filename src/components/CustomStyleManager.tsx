@@ -1,18 +1,18 @@
-import * as React from 'react';
-import { StylesResultProps } from '@grapesjs/react';
-import { mdiMenuDown } from '@mdi/js';
-import Icon from '@mdi/react';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import { MAIN_BG_COLOR } from './common.ts';
-import StylePropertyField from './StylePropertyField.tsx';
+import * as React from "react";
+import { StylesResultProps } from "@grapesjs/react";
+import { mdiMenuDown } from "@mdi/js";
+import Icon from "@mdi/react";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import { MAIN_BG_COLOR } from "./common.ts";
+import StylePropertyField from "./StylePropertyField.tsx";
 
 const accordionIcon = <Icon path={mdiMenuDown} size={0.7} />;
 
 export default function CustomStyleManager({
   sectors,
-}: Omit<StylesResultProps, 'Container'>) {
+}: Omit<StylesResultProps, "Container">) {
   return (
     <div className="gjs-custom-style-manager text-left">
       {sectors.map((sector) => (

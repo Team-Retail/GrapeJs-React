@@ -1,51 +1,51 @@
-import * as React from 'react';
+import * as React from "react";
 import GjsEditor, {
   AssetsProvider,
   Canvas,
   ModalProvider,
-} from '@grapesjs/react';
-import type { Editor, EditorConfig } from 'grapesjs';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { MAIN_BORDER_COLOR } from '../components/common.ts';
-import CustomModal from '../components/CustomModal.tsx';
-import CustomAssetManager from '../components/CustomAssetManager.tsx';
-import Topbar from '../components/Topbar.tsx';
-import RightSidebar from '../components/RightSidebar.tsx';
+} from "@grapesjs/react";
+import type { Editor, EditorConfig } from "grapesjs";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { MAIN_BORDER_COLOR } from "../components/common.ts";
+import CustomModal from "../components/CustomModal.tsx";
+import CustomAssetManager from "../components/CustomAssetManager.tsx";
+import Topbar from "../components/Topbar.tsx";
+import RightSidebar from "../components/RightSidebar.tsx";
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
 });
 
-
 const gjsOptions: EditorConfig = {
-  height: '100vh',
+  height: "100vh",
   storageManager: {
-    type: 'local', // Type of the storage, available: 'local' | 'remote'
+    type: "local", // Type of the storage, available: 'local' | 'remote'
     autosave: true, // Store data automatically
     autoload: true, // Autoload stored data on init
     stepsBeforeSave: 1, // If autosave enabled, indicates how many changes are necessary before store method is triggered
     options: {
-      local: { // Options for the `local` type
-        key: 'gjsProject', // The key for the local storage
+      local: {
+        // Options for the `local` type
+        key: "gjsProject", // The key for the local storage
       },
-    }
+    },
   },
-  
+
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true },
   projectData: {
     assets: [
-      'https://via.placeholder.com/350x250/78c5d6/fff',
-      'https://via.placeholder.com/350x250/459ba8/fff',
-      'https://via.placeholder.com/350x250/79c267/fff',
-      'https://via.placeholder.com/350x250/c5d647/fff',
-      'https://via.placeholder.com/350x250/f28c33/fff',
+      "https://via.placeholder.com/350x250/78c5d6/fff",
+      "https://via.placeholder.com/350x250/459ba8/fff",
+      "https://via.placeholder.com/350x250/79c267/fff",
+      "https://via.placeholder.com/350x250/c5d647/fff",
+      "https://via.placeholder.com/350x250/f28c33/fff",
     ],
     pages: [
       {
-        name: 'Home page',
+        name: "Home page",
         component: `<h1>GrapesJS React Custom UI</h1>`,
       },
     ],
@@ -54,9 +54,8 @@ const gjsOptions: EditorConfig = {
 
 export default function GrapeJSPage() {
   const onEditor = (editor) => {
-    console.log('Editor loaded');
-    (window).editor = editor;
-   
+    console.log("Editor loaded");
+    window.editor = editor;
   };
 
   return (
@@ -68,10 +67,9 @@ export default function GrapeJSPage() {
         options={gjsOptions}
         plugins={[
           {
-            id: 'gjs-blocks-basic',
-            src: 'https://unpkg.com/grapesjs-blocks-basic',
+            id: "gjs-blocks-basic",
+            src: "https://unpkg.com/grapesjs-blocks-basic",
           },
-       
         ]}
         onEditor={onEditor}
       >

@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { LayersResultProps, useEditor } from '@grapesjs/react';
-import type { Component, Editor } from 'grapesjs';
-import { useRef, useState } from 'react';
-import { cx } from './common.ts';
-import LayerItem from './LayerItem.tsx';
+import * as React from "react";
+import { LayersResultProps, useEditor } from "@grapesjs/react";
+import type { Component, Editor } from "grapesjs";
+import { useRef, useState } from "react";
+import { cx } from "./common.ts";
+import LayerItem from "./LayerItem.tsx";
 
 type DragRect = {
   y: number;
@@ -12,23 +12,23 @@ type DragRect = {
 };
 
 const wrapGridStyle = {
-  touchAction: 'none',
+  touchAction: "none",
 };
 
 const LAYER_PAD = 5;
 
 const getDragTarget = (ev: React.PointerEvent) => {
   const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement;
-  const elLayer = el?.closest('[data-layer-item]') as HTMLElement;
+  const elLayer = el?.closest("[data-layer-item]") as HTMLElement;
   return {
     el: elLayer,
     cmp: (elLayer as any)?.__cmp as Component,
   };
 };
 
-type CanMoveResult = ReturnType<Editor['Components']['canMove']>;
+type CanMoveResult = ReturnType<Editor["Components"]["canMove"]>;
 
-interface CanMove extends Partial<Omit<CanMoveResult, 'source'>> {
+interface CanMove extends Partial<Omit<CanMoveResult, "source">> {
   canMoveInside?: CanMoveResult;
   source?: Component | null;
   index?: number;
@@ -36,7 +36,7 @@ interface CanMove extends Partial<Omit<CanMoveResult, 'source'>> {
 
 export default function CustomLayerManager({
   root,
-}: Omit<LayersResultProps, 'Container'>) {
+}: Omit<LayersResultProps, "Container">) {
   const editor = useEditor();
   const [pointerDown, setPointerDown] = useState(false);
   const [canMoveRes, setCanMoveRes] = useState<CanMove>({});
@@ -131,7 +131,7 @@ export default function CustomLayerManager({
       {showIndicator && (
         <div
           ref={indicatorRef}
-          className={cx('absolute w-full h-0.5 bg-yellow-400')}
+          className={cx("absolute w-full h-0.5 bg-yellow-400")}
           style={indicatorStyle}
         ></div>
       )}

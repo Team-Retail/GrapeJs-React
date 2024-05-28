@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { useEditor } from '@grapesjs/react';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import InputAdornment from '@mui/material/InputAdornment';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import type { Trait } from 'grapesjs';
-import { ROUND_BORDER_COLOR, cx } from './common.ts';
+import * as React from "react";
+import { useEditor } from "@grapesjs/react";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import type { Trait } from "grapesjs";
+import { ROUND_BORDER_COLOR, cx } from "./common.ts";
 
 interface StylePropertyFieldProps extends React.HTMLProps<HTMLDivElement> {
   trait: Trait;
@@ -28,9 +28,9 @@ export default function TraitPropertyField({
   };
 
   const handleButtonClick = () => {
-    const command = trait.get('command');
+    const command = trait.get("command");
     if (command) {
-      typeof command === 'string'
+      typeof command === "string"
         ? editor.runCommand(command)
         : command(editor, trait);
     }
@@ -39,7 +39,7 @@ export default function TraitPropertyField({
   const type = trait.getType();
   const defValue = trait.getDefault() || trait.attributes.placeholder;
   const value = trait.getValue();
-  const valueWithDef = typeof value !== 'undefined' ? value : defValue;
+  const valueWithDef = typeof value !== "undefined" ? value : defValue;
 
   let inputToRender = (
     <TextField
@@ -52,7 +52,7 @@ export default function TraitPropertyField({
   );
 
   switch (type) {
-    case 'select':
+    case "select":
       {
         inputToRender = (
           <FormControl fullWidth size="small">
@@ -70,7 +70,7 @@ export default function TraitPropertyField({
         );
       }
       break;
-    case 'color':
+    case "color":
       {
         inputToRender = (
           <TextField
@@ -100,7 +100,7 @@ export default function TraitPropertyField({
         );
       }
       break;
-    case 'checkbox':
+    case "checkbox":
       {
         inputToRender = (
           <Checkbox
@@ -111,7 +111,7 @@ export default function TraitPropertyField({
         );
       }
       break;
-    case 'button':
+    case "button":
       {
         inputToRender = (
           <Button fullWidth onClick={handleButtonClick}>
@@ -123,8 +123,8 @@ export default function TraitPropertyField({
   }
 
   return (
-    <div {...rest} className={cx('mb-3 px-1 w-full')}>
-      <div className={cx('flex mb-2 items-center')}>
+    <div {...rest} className={cx("mb-3 px-1 w-full")}>
+      <div className={cx("flex mb-2 items-center")}>
         <div className="flex-grow capitalize">{trait.getLabel()}</div>
       </div>
       {inputToRender}

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { useEditor } from '@grapesjs/react';
-import { mdiEyeOffOutline, mdiEyeOutline, mdiMenuDown } from '@mdi/js';
-import Icon from '@mdi/react';
-import type { Component } from 'grapesjs';
-import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { MAIN_BORDER_COLOR, cx } from './common.ts';
+import * as React from "react";
+import { useEditor } from "@grapesjs/react";
+import { mdiEyeOffOutline, mdiEyeOutline, mdiMenuDown } from "@mdi/js";
+import Icon from "@mdi/react";
+import type { Component } from "grapesjs";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { MAIN_BORDER_COLOR, cx } from "./common.ts";
 
 export declare interface LayerItemProps
   extends React.HTMLProps<HTMLDivElement> {
@@ -29,7 +29,7 @@ export default function LayerItem({
   const { open, selected, hovered, components, visible, name } = layerData;
   const componentsIds = components.map((cmp) => cmp.getId());
   const isDragging = draggingCmp === component;
-  const cmpHash = componentsIds.join('-');
+  const cmpHash = componentsIds.join("-");
   const level = props.level + 1;
   const isHovered = hovered || dragParent === component;
 
@@ -86,9 +86,9 @@ export default function LayerItem({
   };
 
   const wrapperCls = cx(
-    'layer-item flex flex-col',
-    selected && 'bg-sky-900',
-    (!visible || isDragging) && 'opacity-50'
+    "layer-item flex flex-col",
+    selected && "bg-sky-900",
+    (!visible || isDragging) && "opacity-50",
   );
 
   return (
@@ -103,18 +103,18 @@ export default function LayerItem({
       >
         <div
           className={cx(
-            'flex items-center p-1 pr-2 border-b gap-1',
-            level === 0 && 'border-t',
+            "flex items-center p-1 pr-2 border-b gap-1",
+            level === 0 && "border-t",
             MAIN_BORDER_COLOR,
-            isHovered && 'bg-sky-700',
-            selected && 'bg-sky-500'
+            isHovered && "bg-sky-700",
+            selected && "bg-sky-500",
           )}
         >
           <div
             style={{ marginLeft: `${level * 10}px` }}
             className={cx(
-              'cursor-pointer',
-              !components.length && 'pointer-events-none opacity-0'
+              "cursor-pointer",
+              !components.length && "pointer-events-none opacity-0",
             )}
             onClick={toggleOpen}
           >
@@ -125,8 +125,8 @@ export default function LayerItem({
           </div>
           <div
             className={cx(
-              'group-hover:opacity-100 cursor-pointer',
-              visible ? 'opacity-0' : 'opacity-100'
+              "group-hover:opacity-100 cursor-pointer",
+              visible ? "opacity-0" : "opacity-100",
             )}
             onClick={toggleVisibility}
           >
@@ -138,7 +138,7 @@ export default function LayerItem({
         </div>
       </div>
       {!!(open && components.length) && (
-        <div className={cx('max-w-full', !open && 'hidden')}>{cmpToRender}</div>
+        <div className={cx("max-w-full", !open && "hidden")}>{cmpToRender}</div>
       )}
     </div>
   );
