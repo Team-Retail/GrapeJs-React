@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-.gjs-frame-wrapper,
-.gjs-cv-canvas ,
-.gjs-frame {
-  width:  400px;
+.custom-bg {
+  background-image: url("./assets/wb_1.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
