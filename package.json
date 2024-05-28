@@ -29,7 +29,8 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
-    "react-scripts": "latest"
+    "react-scripts": "latest",
+    "tailwindcss": "^3.4.3"
   },
   "browserslist": {
     "production": [
