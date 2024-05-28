@@ -19,7 +19,6 @@ const theme = createTheme({
 });
 
 
-
 const gjsOptions: EditorConfig = {
   height: '100vh',
   storageManager: {
