@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CiMail } from "react-icons/ci";
+import { CiLock } from "react-icons/ci";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -80,33 +82,35 @@ export default function AuthPage() {
   
 
   return (
-    <main className="w-full h-screen bg-zinc-200 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+    <main className="w-full h-screen bg-zinc-200 items-center">
+      <div className='flex flex-row flex-1'>
+        <div className='bg-gray-200'>
+          <img src='/groupedImage_login.png' className='w-full h-full object-cover' />
+        </div>
+      <div className="flex-1 bg-white p-[6vw] pr-[8vw]">
         <img src='/CAI logo.png' className='w-10 h-10 mb-4' />
         {signIn ? (
           <>
-            <h2 className="text-2xl font-bold mb-2">Account Login</h2>
-            <h6 className='text-lg text-zinc-600 font-normal mb-6'>Welcome back!</h6>
+            <h2 className="text-2xl font-bold mb-2">
+              Welcome
+            </h2>
+            <h6 className='text-lg text-[#6B6B6B] font-normal mb-6'>Enter Your Email ID to get one time password</h6>
             <form onSubmit={handleSignInSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-normal mb-2" htmlFor="email">
-                  Email Address
-                </label>
+              <div className="flex flex-row items-center border border-[#6B6B6B] rounded p-2">
+                <CiMail className='mr-2' size={20} color='#6B6B6B'/>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="border-l-[1.5px] h-6 w-full px-2 text-[#6B6B6B] leading-tight focus:outline-none focus:shadow-outline"
                   id="email_id"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter Your Email"
                   value={formData.email_id}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-normal mb-2" htmlFor="password">
-                  Password
-                </label>
+              <div className="flex flex-row items-center border border-[#6B6B6B] rounded p-2 my-4">
+                <CiLock className='mr-2' size={20} color='#6B6B6B'/>
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="border-l-[1.5px] h-6 w-full px-2 text-[#6B6B6B] leading-tight focus:outline-none focus:shadow-outline"
                   id="password"
                   type="password"
                   placeholder="Enter your password"
@@ -114,18 +118,22 @@ export default function AuthPage() {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className='flex text-xs items-center'>
+                <input type="checkbox" className='scale-75' />
+                <p className='pl-2 text-[#6B6B6B]'>I agree to the <span className='text-[#1A72D3]'>terms and conditions</span> applied</p>
+              </div>
+              <div className="flex items-center justify-between mt-10">
                 <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                  className="bg-[#1A72D3] text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                   type="submit"
                 >
                   Login
                 </button>
               </div>
             </form>
-            <p className='text-xs text-center text-gray-600 font-semibold mt-4'>
-              Don't have an account ?{' '}
-              <span className='text-blue-700 underline cursor-pointer' onClick={toggleForm}>Sign Up here</span>
+            <p className='text-xs text-[#6B6B6B] mt-4'>
+              Don't have an account?{' '}
+              <span className='text-[#1A72D3]  cursor-pointer' onClick={toggleForm}>Sign Up</span>
             </p>
           </>
         ) : (
@@ -215,6 +223,7 @@ export default function AuthPage() {
             </p>
           </>
         )}
+      </div>
       </div>
     </main>
   );
