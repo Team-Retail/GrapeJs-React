@@ -23,16 +23,17 @@ export default function AuthPage() {
       [id]: value,
     }));
   };
+  const BASE_URL = "http://13.235.16.143:3000/api/auth"
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
     const signInData = {
-      email_id: formData.email_id,
+      email: formData.email_id,
       password: formData.password,
     };
 
     try {
-      const res = await axios.post('http://35.194.59.174:3000/api/auth/login', signInData);
+      const res = await axios.post(BASE_URL + '/login', signInData);
       console.log('Sign In Response:', res.data);
       resetForm();
       navigate('/editor');
@@ -43,43 +44,46 @@ export default function AuthPage() {
 
   const handleSignUpSubmit = async (e) => {
     console.log("Click on sign up");
-    
+
     e.preventDefault();
-    const signUpData = {
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      company_name: formData.company_name,
-      email_id: formData.email_id,
-      password: formData.password,
-    };
 
-    try {
-      const res = await axios.post('http://35.194.59.174:3000/api/auth/signup', signUpData);
-      console.log('Sign Up Response:', res.data);
-      resetForm();
-      navigate('/editor');
-    } catch (error) {
-      console.error('Sign Up Error:', error);
-    }
+   
+  const signUpData = {
+    firstName: formData.first_name,
+    lastName: formData.last_name,
+    companyName: formData.company_name,
+    email: formData.email_id,
+    password: formData.password,
+    flag: true,
   };
 
-  const resetForm = () => {
-    setFormData({
-      first_name: '',
-      last_name: '',
-      company_name: '',
-      email_id: '',
-      password: '',
-    });
-  };
-
-  const toggleForm = () => {
-    setSignIn((prevSignIn) => !prevSignIn);
+  try {
+    const res = await axios.post(BASE_URL + '/signup', signUpData);
+    console.log('Sign Up Response:', res.data);
     resetForm();
-  };
+    navigate('/editor');
+  } catch (error) {
+    console.error('Sign Up Error:', error);
+  }
+};
 
-  console.log(formData);
-  
+const resetForm = () => {
+  setFormData({
+    first_name: '',
+    last_name: '',
+    company_name: '',
+    email_id: '',
+    password: '',
+  });
+};
+
+const toggleForm = () => {
+  setSignIn((prevSignIn) => !prevSignIn);
+  resetForm();
+};
+
+console.log(formData);
+
 
   return (
     <main className="w-full h-screen bg-zinc-200 items-center">

@@ -168,7 +168,7 @@ export default function TopbarButtons({
       disabled: () => !UndoManager.hasRedo(),
     },
     {
-      id: 'core:upload',
+      id: 'core:publish',
       iconPath: isLoading ? mdiLoading : mdiUpload,
       disabled: () => isLoading
     },
@@ -176,7 +176,7 @@ export default function TopbarButtons({
 
   // Add the custom upload command to GrapesJS
   useEffect(() => {
-    editor.Commands.add('core:upload', {
+    editor.Commands.add('core:publish', {
       run: handleUpload,
     });
   }, [editor]);
