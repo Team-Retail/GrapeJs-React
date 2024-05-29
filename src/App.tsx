@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import GrapeJSPage from "./pages/GrapeJSPage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
 import Select from "./pages/Select.tsx";
+import CompanyDetails from "./pages/CompanyDetails.tsx";
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
       <Route path="/" element={<AuthPage />} />
       <Route path="/editor" element={<GrapeJSPage />} />
       <Route path="/select" element={<Select />} />
+      <Route path="/company" element={<CompanyDetails />} />
     </Routes>
   );
 }

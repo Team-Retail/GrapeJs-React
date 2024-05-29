@@ -85,14 +85,14 @@ export default function AuthPage() {
 
   return (
     <main className="w-full h-screen bg-zinc-200 items-center">
-      <div className="flex flex-row flex-1 h-full">
-        <div className="bg-gray-200">
+      <div className="flex flex-row flex-1 h-full items-center">
+        <div className="bg-[#F6F7FA] w-[50%] h-full">
           <img
             src="/groupedImage_login.png"
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="flex-1 bg-white p-[6vw] pr-[8vw]">
+        <div className="flex-1 flex flex-col bg-white p-[6vw] w-[50%] h-full justify-center">
           <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
           {signIn ? (
             <>
