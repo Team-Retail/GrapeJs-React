@@ -13,6 +13,7 @@ export default function AuthPage() {
     company_name: "",
     email_id: "",
     password: "",
+    // company_location: "",
   });
   const [signIn, setSignIn] = useState(true);
 
@@ -53,14 +54,19 @@ export default function AuthPage() {
       companyName: formData.company_name,
       email: formData.email_id,
       password: formData.password,
+      // companyLocation: formData.company_location,
       flag: true,
     };
 
     try {
       const res = await axios.post(BASE_URL + "/signup", signUpData);
       console.log("Sign Up Response:", res.data);
+      localStorage.setItem(
+        "COMPANY_USERNAME",
+        res.data.companyName + " " + res.data.firstName + res.data.lastName,
+      );
       resetForm();
-      navigate("/editor");
+      navigate("/company");
     } catch (error) {
       console.error("Sign Up Error:", error);
     }
@@ -73,6 +79,7 @@ export default function AuthPage() {
       company_name: "",
       email_id: "",
       password: "",
+      // company_location: "",
     });
   };
 
@@ -81,11 +88,11 @@ export default function AuthPage() {
     resetForm();
   };
 
-  console.log(formData);
+  // console.log(formData);
 
   return (
-    <main className="w-full h-screen bg-zinc-200 items-center">
-      <div className="flex flex-row flex-1 h-full items-center">
+    <main className="w-full items-center">
+      <div className="flex flex-row flex-1">
         <div className="bg-[#F6F7FA] w-[50%] h-full">
           <img
             src="/groupedImage_login.png"
@@ -93,9 +100,9 @@ export default function AuthPage() {
           />
         </div>
         <div className="flex-1 flex flex-col bg-white p-[6vw] w-[50%] h-full justify-center">
-          <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
           {signIn ? (
             <>
+              <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
               <h2 className="text-2xl font-bold mb-2">Welcome</h2>
               <h6 className="text-lg text-[#6B6B6B] font-normal mb-6">
                 Enter Your Email ID to get one time password
@@ -133,7 +140,7 @@ export default function AuthPage() {
                 </div>
                 <div className="flex items-center justify-between mt-10">
                   <button
-                    className="bg-[#1A72D3] text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                    className="bg-[#1A72D3] hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                     type="submit"
                   >
                     Login
@@ -152,6 +159,7 @@ export default function AuthPage() {
             </>
           ) : (
             <>
+              <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
               <h2 className="text-2xl font-bold mb-2">Create Account</h2>
               <h6 className="text-lg text-zinc-600 font-normal mb-6">
                 Sign up to get started!
@@ -207,6 +215,22 @@ export default function AuthPage() {
                     onChange={handleInputChange}
                   />
                 </div>
+                {/* <div className="mb-4">
+                  <label
+                    className="block text-gray-700 text-sm font-normal mb-2"
+                    htmlFor="companyLocation"
+                  >
+                    Company Location
+                  </label>
+                  <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="company_location"
+                    type="text"
+                    placeholder="Enter your company location"
+                    value={formData.company_location}
+                    onChange={handleInputChange}
+                  />
+                </div> */}
                 <div className="mb-4">
                   <label
                     className="block text-gray-700 text-sm font-normal mb-2"
@@ -251,7 +275,7 @@ export default function AuthPage() {
               <p className="text-xs text-center text-gray-600 font-semibold mt-4">
                 Already have an account ?{" "}
                 <span
-                  className="text-blue-700 underline cursor-pointer"
+                  className="text-blue-500 cursor-pointer"
                   onClick={toggleForm}
                 >
                   Sign In here
