@@ -1,18 +1,17 @@
-import * as React from "react";
 import GjsEditor, {
   AssetsProvider,
   Canvas,
   ModalProvider,
 } from "@grapesjs/react";
-import type { Editor, EditorConfig } from "grapesjs";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { MAIN_BORDER_COLOR } from "../components/common.ts";
-import CustomModal from "../components/CustomModal.tsx";
-import CustomAssetManager from "../components/CustomAssetManager.tsx";
-import Topbar from "../components/Topbar.tsx";
-import RightSidebar from "../components/RightSidebar.tsx";
+import axios from 'axios';
+import * as React from "react";
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS
+import CustomAssetManager from "../components/CustomAssetManager.tsx";
+import CustomModal from "../components/CustomModal.tsx";
 import SidebarContent from "../components/SidebarContent.tsx";
+import Topbar from "../components/Topbar.tsx";
+import { MAIN_BORDER_COLOR } from "../components/common.ts";
 import { Template1 } from "../utils/template.ts";
 
 const theme = createTheme({
@@ -21,14 +20,46 @@ const theme = createTheme({
   },
 });
 
+const userId = "665776a9c5cf110d47a3d097";
+const saveJsonApiUrl = "http://13.235.16.143:3000/api/auth/save-json";
+const getJsonApiUrl = "http://13.235.16.143:3000/api/auth/get-json/";
+
+// Function to save data to remote server
+const saveData = async (data) => {
+  console.log("save data called")
+  try {
+    const response = await axios.post(saveJsonApiUrl, {
+      userId,
+      JSONString: JSON.stringify(data),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+};
+
+// Function to load data from remote server
+const loadData = async () => {
+  try {
+    const response = await axios.get(getJsonApiUrl+userId );
+    // if(response.status===201){
+
+    // }
+    return JSON.parse(response.data.JSONString);
+    // return Template1
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
+};
+
+
+
 const gjsOptions = {
   height: "100vh",
-  storageManager: {
-    type: "local",
-    options: {
-      local: { key: `gjsProject` },
-    },
+  storageManager:{
+    type:'remote',
   },
+  
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true },
   styleManager: {
@@ -78,7 +109,6 @@ const tailwindClasses = [
   // Add more Tailwind CSS classes as needed
 ];
 
-console.log(JSON.stringify(Template1))
 const editorPlugins = (editor) => {
   // Load Tailwind classes into style manager
   const styleManager = editor.StyleManager;
@@ -97,15 +127,42 @@ const editorPlugins = (editor) => {
         units: ['px', 'rem', 'em', '%', 'vw', 'vh'],
       });
     });
+
+
   });
+  
+
+  
+
+  // Custom save action
+  
 };
 
-
 export default function GrapeJSPage() {
-  const onEditor = (editor) => {
+  const onEditor = async (editor) => {
     console.log("Editor loaded");
     window.editor = editor;
     editorPlugins(editor);
+    // Load data when the editor initializes
+    // const initialData = await loadData();
+    // if (initialData) {
+    //   editor.setComponents(JSON.parse(initialData));
+    // }
+
+    editor.Storage.add('remote', {
+      async load() {
+        const initialData = await loadData();
+        console.log("initialData",initialData)
+        return initialData;
+      },
+
+      async store(data) {
+        console.log(data)
+        return await saveData(data);
+      },
+    });
+
+    
   };
 
   const [activeTab, setActiveTab] = React.useState<string | null>(null);
@@ -126,16 +183,12 @@ export default function GrapeJSPage() {
         onEditor={onEditor}
       >
         <Topbar
-          // className="min-h-[48px] fixed top-[30px] left-0 w-full bg-white shadow-md m-3"
           setSidebarState={setActiveTab}
         />
         <div className={`flex h-full border-t ${MAIN_BORDER_COLOR}`}>
           <div className="gjs-column-m flex flex-col mt-[18vh] mr-[30vw] ml-8 w-full">
             <Canvas className="gjs-custom-editor-canvas w-full shadow-xl" />
           </div>
-          {/* <RightSidebar
-            className={`gjs-column-r w-[300px] border-l ${MAIN_BORDER_COLOR}`}
-          /> */}
           <SidebarContent activeTab={activeTab} />
         </div>
         <ModalProvider>

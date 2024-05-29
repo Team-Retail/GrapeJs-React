@@ -65,6 +65,8 @@ export default function AuthPage() {
         "COMPANY_USERNAME",
         res.data.companyName + " " + res.data.firstName + res.data.lastName,
       );
+      
+
       resetForm();
       navigate("/company");
     } catch (error) {

@@ -79,6 +79,7 @@ export default function TopbarButtons({
     const htmlContent = editor.getHtml();
     const cssContent = editor.getCss();
     setisLoading(true);
+    const usernameFolder = localStorage.getItem("COMPANY_USERNAME");
 
     try {
       const completeHtml = `
@@ -109,7 +110,7 @@ export default function TopbarButtons({
 
       const bucketName = import.meta.env.VITE_APP_AWS_BUCKET_NAME;
       console.log(ref.current);
-      const htmlFilename = `template-${ref.current}.html`;
+      const htmlFilename = `${usernameFolder||"common"}/template-${ref.current}.html`;
 
       // Upload the HTML file
       const resp = await s3Client.send(
