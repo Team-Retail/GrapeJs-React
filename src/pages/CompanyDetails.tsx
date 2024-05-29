@@ -1,10 +1,10 @@
 import { useState, FormEvent, useRef } from "react";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-// import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
-// import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { LocationClient } from "@aws-sdk/client-location";
 import { SearchPlaceIndexForTextCommand } from "@aws-sdk/client-location";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -14,7 +14,8 @@ export default function CompanyDetails() {
   const [businessCardBack, setBusinessCardBack] = useState<FileList | null>(
     null,
   );
-  const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
+  const navigate = useNavigate();
+  // const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
 
   const [formData, setFormData] = useState({
     // company_name: "",
@@ -22,17 +23,24 @@ export default function CompanyDetails() {
     company_instagram: "",
     company_twitter: "",
     company_address: "",
-    companyLogoUrl: "",
-    businessCardFrontUrl: "",
-    businessCardBackUrl: "",
-    companyLocationUrl: "",
+    // companyLogoUrl: "",
+    // businessCardFrontUrl: "",
+    // businessCardBackUrl: "",
+    // companyLocationUrl: "",
   });
 
   // const [query, setQuery] = useState("");
   // const [loading, setLoading] = useState(false);
 
   const [suggestions, setSuggestions] = useState([]);
-
+  const [companyAddress, setCompanyAddress] = useState("");
+  // const [companyLogoUrl, setCompanyLogoUrl] = useState("");
+  // const [businessCardFrontUrl, setBusinessCardFrontUrl] = useState("");
+  // const [businessCardBackUrl, setBusinessCardBackUrl] = useState("");
+  const companyLogoUrlRef = useRef("");
+  const businessCardFrontUrlRef = useRef("");
+  const businessCardBackUrlRef = useRef("");
+  const BASE_URL = "http://13.235.16.143:3000/api/auth";
   const [isLoading, setIsLoading] = useState(false);
   const ref = useRef(Date.now());
 
@@ -78,65 +86,51 @@ export default function CompanyDetails() {
   const handleFileUpload = async () => {
     setIsLoading(true);
     const usernameFolder = localStorage.getItem("COMPANY_USERNAME");
-    if (companyLogo) {
+
+    const uploadPromises = [];
+
+    if (companyLogo && companyLogo.length > 0) {
       const logoKey = `${usernameFolder}/companyLogo-${ref.current}-${companyLogo[0].name}`;
-      const logoUrl = await uploadFileToS3(companyLogo, logoKey);
-      console.log(logoUrl);
-      if (logoUrl)
-        setFormData((prev) => ({ ...prev, companyLogoUrl: logoUrl }));
+      uploadPromises.push(
+        uploadFileToS3(companyLogo, logoKey).then((logoUrl) => {
+          if (logoUrl) {
+            companyLogoUrlRef.current = logoUrl;
+            console.log("Company Logo URL:", logoUrl);
+          }
+        }),
+      );
     }
 
-    if (businessCardFront) {
+    if (businessCardFront && businessCardFront.length > 0) {
       const frontKey = `${usernameFolder}/businessCardFront-${ref.current}-${businessCardFront[0].name}`;
-      const frontUrl = await uploadFileToS3(businessCardFront, frontKey);
-      if (frontUrl)
-        setFormData((prev) => ({ ...prev, businessCardFrontUrl: frontUrl }));
+      uploadPromises.push(
+        uploadFileToS3(businessCardFront, frontKey).then((frontUrl) => {
+          if (frontUrl) {
+            businessCardFrontUrlRef.current = frontUrl;
+            console.log("Business Card Front URL:", frontUrl);
+          }
+        }),
+      );
     }
 
-    if (businessCardBack) {
+    if (businessCardBack && businessCardBack.length > 0) {
       const backKey = `${usernameFolder}/businessCardBack-${ref.current}-${businessCardBack[0].name}`;
-      const backUrl = await uploadFileToS3(businessCardBack, backKey);
-      if (backUrl)
-        setFormData((prev) => ({ ...prev, businessCardBackUrl: backUrl }));
+      uploadPromises.push(
+        uploadFileToS3(businessCardBack, backKey).then((backUrl) => {
+          if (backUrl) {
+            businessCardBackUrlRef.current = backUrl;
+            console.log("Business Card Back URL:", backUrl);
+          }
+        }),
+      );
     }
-
-    if (companyLocation) {
-      const locationKey = `${usernameFolder}/companyLocation-${ref.current}-${companyLocation[0].name}`;
-      const locationUrl = await uploadFileToS3(companyLocation, locationKey);
-      if (locationUrl)
-        setFormData((prev) => ({ ...prev, companyLocationUrl: locationUrl }));
-    }
+    await Promise.all(uploadPromises);
 
     setIsLoading(false);
   };
 
-  // const handleAddressChange = async (e: FormEvent<HTMLInputElement>) => {
-  //   const value = e.currentTarget.value;
-  //   setQuery(value);
-  //   if (value.length < 3) {
-  //     setSuggestions([]);
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     const response = await client.send(
-  //       new SearchPlaceIndexForTextCommand({
-  //         IndexName: "YourPlaceIndexName",
-  //         Text: value,
-  //       }),
-  //     );
-  //     setSuggestions(response.Results || []);
-  //   } catch (error) {
-  //     console.error("Error searching for place:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const searchLocation = async (query: any) => {
     const client = new LocationClient({
-      // region: import.meta.env.VITE_APP_AWS_REGION,
       region: "ap-south-1",
       credentials: {
         accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_LOCATION,
@@ -186,14 +180,37 @@ export default function CompanyDetails() {
       // latitude: Latitude,
       // longitude: Longitude,
     }));
-
+    setCompanyAddress(`${Latitude},${Longitude}`);
     setSuggestions([]);
   };
 
   const submitForm = async () => {
-    console.log(import.meta.env.VITE_APP_AWS_REGION);
     await handleFileUpload();
     console.log(formData);
+    const user = JSON.parse(localStorage.getItem("userDetails") || "{}");
+    console.log(user);
+    const companyData = {
+      user_id: user ? user?._id : "",
+      twitter: formData.company_twitter,
+      insta: formData.company_instagram,
+      logo_url: companyLogoUrlRef.current,
+      company_website: formData.company_website,
+      business_card_front: businessCardFrontUrlRef.current,
+      business_card_back: businessCardBackUrlRef.current,
+      companyLocation: companyAddress,
+    };
+    console.log(companyData);
+    try {
+      const res = await axios.post(
+        BASE_URL + "/createSocialMedia",
+        companyData,
+      );
+      console.log("Company Detail Submit response", res.data);
+      clearForm();
+      navigate("/editor");
+    } catch (error) {
+      console.error("Error saving company data:", error);
+    }
   };
 
   const clearForm = () => {
@@ -203,15 +220,15 @@ export default function CompanyDetails() {
       company_instagram: "",
       company_twitter: "",
       company_address: "",
-      companyLogoUrl: "",
-      businessCardFrontUrl: "",
-      businessCardBackUrl: "",
-      companyLocationUrl: "",
+      // companyLogoUrl: "",
+      // businessCardFrontUrl: "",
+      // businessCardBackUrl: "",
+      // companyLocationUrl: "",
     });
     setCompanyLogo(null);
     setBusinessCardFront(null);
     setBusinessCardBack(null);
-    setCompanyLocation(null);
+    // setCompanyLocation(null);
   };
 
   return (
@@ -340,7 +357,7 @@ export default function CompanyDetails() {
           <div className="flex w-full justify-between gap-3">
             <input
               // id="company_address"
-              className="w-[80%] border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
+              className="w-full border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
               type="text"
               placeholder="Your answer"
               value={formData.company_address}
