@@ -150,6 +150,7 @@ export default function CompanyDetails() {
         new SearchPlaceIndexForTextCommand(params),
       );
       if (response && response?.Results) {
+        // @ts-ignore
         setSuggestions(response?.Results);
       } else {
         setSuggestions([]);
@@ -207,7 +208,7 @@ export default function CompanyDetails() {
       );
       console.log("Company Detail Submit response", res.data);
       clearForm();
-      navigate("/editor");
+      navigate("/select");
     } catch (error) {
       console.error("Error saving company data:", error);
     }
@@ -374,6 +375,7 @@ export default function CompanyDetails() {
                     className="p-2 cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
+                    {/* @ts-ignore */}
                     {suggestion?.Place?.Label}
                   </li>
                 ))}

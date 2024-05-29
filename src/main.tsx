@@ -10,4 +10,5 @@ const AppWrapper = () => (
   </BrowserRouter>
 );
 
+//@ts-ignore
 ReactDOM.createRoot(document.getElementById("root")!).render(<AppWrapper />);

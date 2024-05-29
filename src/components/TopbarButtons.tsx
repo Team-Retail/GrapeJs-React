@@ -20,6 +20,17 @@ import { BTN_CLS, MAIN_BORDER_COLOR, cx } from "./common.ts";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import Modal from "@mui/material/Modal";
 import QRCode from "qrcode.react";
+import axios from "axios";
+
+// @ts-ignore
+const generateRandomAlphanumeric = (length) => {
+  const characters = '0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
 interface CommandButton {
   id: string;
   iconPath: string;
@@ -38,17 +49,16 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+// @ts-ignore
 
-export default function TopbarButtons({
-  className,
-  setSidebarState,
-}: React.HTMLAttributes<HTMLDivElement>) {
+export default function TopbarButtons({className,  setSidebarState,}: React.HTMLAttributes<HTMLDivElement>) {
   const editor = useEditor();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
   const { UndoManager, Commands } = editor;
   const [isLoading, setisLoading] = useState(false);
   const ref = React.useRef<string>();
+  const [coded, setCoded] = useState("")
 
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
@@ -126,7 +136,22 @@ export default function TopbarButtons({
 
       const url = `https://${bucketName}.s3.${import.meta.env.VITE_APP_AWS_REGION}.amazonaws.com/${htmlFilename}`;
 
+      const code = generateRandomAlphanumeric(6);
+      console.log(code)
+      // @ts-ignore
+
+      const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+
+
+      // Send the data to the remote server
+      const ress = await axios.post("http://13.235.16.143:3000/api/auth/content", {
+        URL: url,
+        userId,
+        code: code.toString(),
+      });
+
       // Set the URL in the state variable
+      setCoded(code)
       setUrl(url);
       setOpen(true);
     } catch (error) {
@@ -216,6 +241,7 @@ export default function TopbarButtons({
       >
         <Box sx={style} className="w-full flex flex-col gap-6 !pt-8 rounded-lg">
           <QRCode value={url} className="!w-60  !h-60 mx-auto" />
+          <p className="text-center tracking-widest p-2 bg-black text-white rounded-lg w-fit mx-auto font-bold">{coded}</p>
           <a
             href={url}
             target="_blank"

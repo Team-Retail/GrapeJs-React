@@ -12,7 +12,6 @@ import CustomModal from "../components/CustomModal.tsx";
 import SidebarContent from "../components/SidebarContent.tsx";
 import Topbar from "../components/Topbar.tsx";
 import { MAIN_BORDER_COLOR } from "../components/common.ts";
-import { Template1 } from "../utils/template.ts";
 
 const theme = createTheme({
   palette: {
@@ -20,13 +19,19 @@ const theme = createTheme({
   },
 });
 
-const userId = "665776a9c5cf110d47a3d097";
+
 const saveJsonApiUrl = "http://13.235.16.143:3000/api/auth/save-json";
 const getJsonApiUrl = "http://13.235.16.143:3000/api/auth/get-json/";
 
 // Function to save data to remote server
+// @ts-ignore
+
 const saveData = async (data) => {
   console.log("save data called")
+  // @ts-ignore
+
+  const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+
   try {
     const response = await axios.post(saveJsonApiUrl, {
       userId,
@@ -41,6 +46,10 @@ const saveData = async (data) => {
 // Function to load data from remote server
 const loadData = async () => {
   try {
+    // @ts-ignore
+
+    const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+
     const response = await axios.get(getJsonApiUrl+userId );
     // if(response.status===201){
 
@@ -109,6 +118,8 @@ const tailwindClasses = [
   // Add more Tailwind CSS classes as needed
 ];
 
+// @ts-ignore
+
 const editorPlugins = (editor) => {
   // Load Tailwind classes into style manager
   const styleManager = editor.StyleManager;
@@ -121,7 +132,11 @@ const editorPlugins = (editor) => {
   });
 
   // Extend CSS property units
+  // @ts-ignore
+
   editor.StyleManager.getSectors().forEach(sector => {
+    // @ts-ignore
+
     sector.getProperties().forEach(property => {
       property.set({
         units: ['px', 'rem', 'em', '%', 'vw', 'vh'],
@@ -139,8 +154,12 @@ const editorPlugins = (editor) => {
 };
 
 export default function GrapeJSPage() {
+  // @ts-ignore
+
   const onEditor = async (editor) => {
     console.log("Editor loaded");
+    // @ts-ignore
+
     window.editor = editor;
     editorPlugins(editor);
     // Load data when the editor initializes
@@ -155,6 +174,8 @@ export default function GrapeJSPage() {
         console.log("initialData",initialData)
         return initialData;
       },
+      // @ts-ignore
+
 
       async store(data) {
         console.log(data)

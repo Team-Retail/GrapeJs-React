@@ -47,6 +47,7 @@ export default function Topbar({ setSidebarState }: { setSidebarState: any }) {
       <WithEditor>
         <TopbarButtons
           className="ml-auto px-2"
+          // @ts-ignore
           setSidebarState={setSidebarState}
         />
       </WithEditor>
