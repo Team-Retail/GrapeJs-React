@@ -5,6 +5,11 @@ import {
   mdiFullscreen,
   mdiLoading,
   mdiUpload,
+  mdiBrush,
+  mdiLayers,
+  mdiViewGridPlus,
+  mdiTextBoxMultiple,
+  mdiCog,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import Box from "@mui/material/Box";
@@ -12,12 +17,7 @@ import CryptoJS from "crypto-js";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { BTN_CLS, MAIN_BORDER_COLOR, cx } from "./common.ts";
-
-import {
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
-
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import Modal from "@mui/material/Modal";
 import QRCode from "qrcode.react";
 interface CommandButton {
@@ -41,6 +41,7 @@ const style = {
 
 export default function TopbarButtons({
   className,
+  setSidebarState,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const editor = useEditor();
   const [url, setUrl] = useState("");
@@ -48,6 +49,8 @@ export default function TopbarButtons({
   const { UndoManager, Commands } = editor;
   const [isLoading, setisLoading] = useState(false);
   const ref = React.useRef<string>();
+
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
   useEffect(() => {
     const newHash = CryptoJS.MD5(new Date() + "").toString();
@@ -58,7 +61,7 @@ export default function TopbarButtons({
     const cmdEvent = "run stop";
     const onCommand = (id: string) => {
       console.log("command id:", id);
-      cmdButtons.find((btn) => btn.id === id)
+      cmdButtons.find((btn) => btn.id === id);
     };
     editor.on(cmdEvent, onCommand);
     // editor.on(updateEvent);
@@ -140,14 +143,34 @@ export default function TopbarButtons({
       options: { target: "#root" },
     },
     {
+      id: "core:redo",
+      iconPath: mdiArrowURightTop,
+      disabled: () => !UndoManager.hasRedo(),
+    },
+    {
       id: "core:undo",
       iconPath: mdiArrowULeftTop,
       disabled: () => !UndoManager.hasUndo(),
     },
     {
-      id: "core:redo",
-      iconPath: mdiArrowURightTop,
-      disabled: () => !UndoManager.hasRedo(),
+      id: "core:brush",
+      iconPath: mdiBrush,
+    },
+    {
+      id: "core:settings",
+      iconPath: mdiCog,
+    },
+    {
+      id: "core:layers",
+      iconPath: mdiLayers,
+    },
+    {
+      id: "core:grid",
+      iconPath: mdiViewGridPlus,
+    },
+    {
+      id: "core:text",
+      iconPath: mdiTextBoxMultiple,
     },
     {
       id: "core:upload",
@@ -155,6 +178,23 @@ export default function TopbarButtons({
       disabled: () => isLoading,
     },
   ];
+
+  const handleButtonClick = (id: string, options: Record<string, any>) => {
+    setActiveTab(id);
+    const tabIds = [
+      "core:brush",
+      "core:settings",
+      "core:layers",
+      "core:grid",
+      "core:text",
+    ];
+    if (tabIds.includes(id)) {
+      // setActiveTab(id);
+      setSidebarState(id);
+    } else {
+      Commands.isActive(id) ? Commands.stop(id) : Commands.run(id, options);
+    }
+  };
 
   // Add the custom upload command to GrapesJS
   useEffect(() => {
@@ -164,7 +204,7 @@ export default function TopbarButtons({
   }, [editor]);
 
   return (
-    <div className={cx("flex gap-3", className)}>
+    <div className={cx("flex flex-row gap-3", className)}>
       <Modal
         open={open}
         onClose={() => {
@@ -185,30 +225,37 @@ export default function TopbarButtons({
           </a>
         </Box>
       </Modal>
-      {cmdButtons.map(({ id, iconPath, disabled, options = {} }) => (
-        <button
-          key={id}
-          type="button"
-          className={cx(
-            BTN_CLS,
-            MAIN_BORDER_COLOR,
-            Commands.isActive(id) && "text-sky-300",
-            disabled?.() && "opacity-50",
-          )}
-          onClick={() =>
-            Commands.isActive(id)
-              ? Commands.stop(id)
-              : Commands.run(id, options)
-          }
-          disabled={disabled?.()}
-        >
-          <Icon
-            path={iconPath}
-            size={1}
-            className={cx(id === "core:upload" && isLoading && "animate-spin")}
-          />
-        </button>
-      ))}
+      <div className="flex flex-row gap-2">
+        {cmdButtons.map(({ id, iconPath, disabled, options = {} }) => (
+          <button
+            key={id}
+            type="button"
+            className={cx(
+              // BTN_CLS,
+              // MAIN_BORDER_COLOR,
+              id !== "core:upload" && "rounded text-[#000000B8] p-2",
+              id === "core:upload" &&
+                "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
+              activeTab === id && "text-[#1D85E6] bg-[#D1EAFF]",
+              // Commands.isActive(id) && "text-[#1D85E6]",
+              disabled?.() && "opacity-50",
+            )}
+            onClick={() => handleButtonClick(id, options)}
+            disabled={disabled?.()}
+          >
+            <Icon
+              path={iconPath}
+              size={1}
+              className={cx(
+                id === "core:upload" && isLoading && "animate-spin",
+              )}
+            />
+            {id === "core:upload" && (
+              <p className="text-white text-sm pl-1">Publish</p>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

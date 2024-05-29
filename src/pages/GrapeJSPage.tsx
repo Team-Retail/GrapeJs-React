@@ -12,6 +12,7 @@ import CustomAssetManager from "../components/CustomAssetManager.tsx";
 import Topbar from "../components/Topbar.tsx";
 import RightSidebar from "../components/RightSidebar.tsx";
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS
+import SidebarContent from "../components/SidebarContent.tsx";
 
 const theme = createTheme({
   palette: {
@@ -22,10 +23,10 @@ const theme = createTheme({
 const gjsOptions = {
   height: "100vh",
   storageManager: {
-    type: 'local',
+    type: "local",
     options: {
-      local: { key: `gjsProject` }
-    }
+      local: { key: `gjsProject` },
+    },
   },
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true },
@@ -105,10 +106,12 @@ export default function GrapeJSPage() {
     editorPlugins(editor);
   };
 
+  const [activeTab, setActiveTab] = React.useState<string | null>(null);
+
   return (
     <ThemeProvider theme={theme}>
       <GjsEditor
-        className="gjs-custom-editor text-white bg-slate-900"
+        className="gjs-custom-editor text-white bg-white"
         grapesjs="https://unpkg.com/grapesjs"
         grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
         options={gjsOptions}
@@ -120,14 +123,18 @@ export default function GrapeJSPage() {
         ]}
         onEditor={onEditor}
       >
+        <Topbar
+          // className="min-h-[48px] fixed top-[30px] left-0 w-full bg-white shadow-md m-3"
+          setSidebarState={setActiveTab}
+        />
         <div className={`flex h-full border-t ${MAIN_BORDER_COLOR}`}>
-          <div className="gjs-column-m flex flex-col flex-grow">
-            <Topbar className="min-h-[48px]" />
-            <Canvas className="flex-grow gjs-custom-editor-canvas" />
+          <div className="gjs-column-m flex flex-col mt-[18vh] mr-[30vw] ml-8 w-full">
+            <Canvas className="gjs-custom-editor-canvas w-full shadow-xl" />
           </div>
-          <RightSidebar
+          {/* <RightSidebar
             className={`gjs-column-r w-[300px] border-l ${MAIN_BORDER_COLOR}`}
-          />
+          /> */}
+          <SidebarContent activeTab={activeTab} />
         </div>
         <ModalProvider>
           {({ open, title, content, close }) => (

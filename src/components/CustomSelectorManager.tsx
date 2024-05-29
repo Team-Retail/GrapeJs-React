@@ -30,8 +30,16 @@ export default function CustomSelectorManager({
         <FormControl size="small">
           <Select
             value={selectedState}
+            className="border-[#053663] border rounded-[14px] focus:outline-none px-2"
             onChange={(ev) => setState(ev.target.value)}
             displayEmpty
+            sx={{
+              color: "#053663", // Change text color
+              "& .MuiSelect-icon": {
+                color: "#053663", // Change arrow color
+              },
+              fontSize: "0.875rem",
+            }}
           >
             <MenuItem value="">- State -</MenuItem>
             {states.map((state) => (
