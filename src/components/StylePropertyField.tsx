@@ -32,17 +32,29 @@ interface StylePropertyFieldProps extends React.HTMLProps<HTMLDivElement> {
   prop: Property;
 }
 
+const units = ['px', 'rem', 'em', '%', 'vw', 'vh'];
+
 export default function StylePropertyField({
   prop,
   ...rest
 }: StylePropertyFieldProps) {
   const editor = useEditor();
+  const [unit, setUnit] = React.useState(units[0]); // default to 'px'
+  const [value, setValue] = React.useState('');
+
   const handleChange = (value: string) => {
-    prop.upValue(value);
+    prop.upValue(`${value}${unit}`);
   };
 
   const onChange = (ev: any) => {
-    handleChange(ev.target.value);
+    const inputValue = ev.target.value.replace(/[^\d.-]/g, ''); // Remove non-numeric characters
+    setValue(inputValue);
+    handleChange(inputValue);
+  };
+
+  const handleUnitChange = (ev: any) => {
+    setUnit(ev.target.value);
+    handleChange(value);
   };
 
   const openAssets = () => {
@@ -62,7 +74,6 @@ export default function StylePropertyField({
   const defValue = prop.getDefaultValue();
   const canClear = prop.canClear();
   const hasValue = prop.hasValue();
-  const value = prop.getValue();
   const valueString = hasValue ? value : "";
   const valueWithDef = hasValue ? value : defValue;
 
@@ -73,6 +84,21 @@ export default function StylePropertyField({
       onChange={onChange}
       size="small"
       fullWidth
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <FormControl size="small" className="absolute right-0">
+              <Select value={unit} onChange={handleUnitChange}>
+                {units.map((u) => (
+                  <MenuItem key={u} value={u}>
+                    {u}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </InputAdornment>
+        )
+      }}
     />
   );
 
