@@ -1,5 +1,6 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -12,29 +13,105 @@ export default function CompanyDetails() {
   const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
 
   const [formData, setFormData] = useState({
-    company_name: "",
+    // company_name: "",
     company_website: "",
     company_instagram: "",
     company_twitter: "",
     company_address: "",
+    companyLogoUrl: "",
+    businessCardFrontUrl: "",
+    businessCardBackUrl: "",
+    companyLocationUrl: "",
   });
 
-  const submitForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const ref = useRef(Date.now());
+
+  const s3Client = new S3Client({
+    region: import.meta.env.VITE_APP_AWS_REGION,
+    credentials: {
+      accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: import.meta.env.VITE_APP_AWS_SECRET_ACCESS_KEY,
+    },
+  });
+
+  const bucketName = import.meta.env.VITE_APP_AWS_BUCKET_NAME;
+
+  const uploadFileToS3 = async (file: FileList, key: string) => {
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+      Body: file[0],
+      ContentType: file[0].type,
+    };
+
+    try {
+      await s3Client.send(new PutObjectCommand(params));
+      return `https://${bucketName}.s3.${import.meta.env.VITE_APP_AWS_REGION}.amazonaws.com/${key}`;
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Failed to upload file.");
+      return null;
+    }
+  };
+
+  const handleFileUpload = async () => {
+    setIsLoading(true);
+    const usernameFolder = localStorage.getItem("COMPANY_USERNAME");
+    if (companyLogo) {
+      const logoKey = `${usernameFolder}/companyLogo-${ref.current}-${companyLogo[0].name}`;
+      const logoUrl = await uploadFileToS3(companyLogo, logoKey);
+      console.log(logoUrl);
+      if (logoUrl)
+        setFormData((prev) => ({ ...prev, companyLogoUrl: logoUrl }));
+    }
+
+    if (businessCardFront) {
+      const frontKey = `${usernameFolder}/businessCardFront-${ref.current}-${businessCardFront[0].name}`;
+      const frontUrl = await uploadFileToS3(businessCardFront, frontKey);
+      if (frontUrl)
+        setFormData((prev) => ({ ...prev, businessCardFrontUrl: frontUrl }));
+    }
+
+    if (businessCardBack) {
+      const backKey = `${usernameFolder}/businessCardBack-${ref.current}-${businessCardBack[0].name}`;
+      const backUrl = await uploadFileToS3(businessCardBack, backKey);
+      if (backUrl)
+        setFormData((prev) => ({ ...prev, businessCardBackUrl: backUrl }));
+    }
+
+    if (companyLocation) {
+      const locationKey = `${usernameFolder}/companyLocation-${ref.current}-${companyLocation[0].name}`;
+      const locationUrl = await uploadFileToS3(companyLocation, locationKey);
+      if (locationUrl)
+        setFormData((prev) => ({ ...prev, companyLocationUrl: locationUrl }));
+    }
+
+    setIsLoading(false);
+  };
+
+  const submitForm = async () => {
+    console.log(import.meta.env.VITE_APP_AWS_REGION);
+    await handleFileUpload();
     console.log(formData);
-    console.log(companyLogo);
-    console.log(businessCardFront);
-    console.log(businessCardBack);
-    console.log(companyLocation);
   };
 
   const clearForm = () => {
     setFormData({
-      company_name: "",
+      // company_name: "",
       company_website: "",
       company_instagram: "",
       company_twitter: "",
       company_address: "",
+      companyLogoUrl: "",
+      businessCardFrontUrl: "",
+      businessCardBackUrl: "",
+      companyLocationUrl: "",
     });
+    setCompanyLogo(null);
+    setBusinessCardFront(null);
+    setBusinessCardBack(null);
+    setCompanyLocation(null);
   };
 
   return (
@@ -49,7 +126,7 @@ export default function CompanyDetails() {
           submitForm();
         }}
       >
-        <div className="border flex flex-col p-6 w-full rounded-[14px]">
+        {/* <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">1. Please enter your Company Name</label>
           <input
             className="border-b-2 w-full mt-2 outline-none text-[#6B6B6B]"
@@ -60,13 +137,13 @@ export default function CompanyDetails() {
               setFormData({ ...formData, company_name: e.target.value })
             }
           />
-        </div>
+        </div> */}
         <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">
-            2. Please enter your Company website link
+            1. Please enter your Company website link
           </label>
           <input
-            className="border-b-2 w-full mt-2 outline-none text-[#6B6B6B]"
+            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
             type="text"
             placeholder="Enter website link"
             value={formData.company_website}
@@ -76,7 +153,7 @@ export default function CompanyDetails() {
           />
         </div>
         <div className="border flex flex-col p-6 rounded-[14px]">
-          <p className="text-lg mb-3">3. Upload Company Logo</p>
+          <p className="text-lg mb-3">2. Upload Company Logo</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
             <MdOutlineFileUpload type="image/*;capture=camera" color="#1A72D3" />
             Add file
@@ -90,7 +167,7 @@ export default function CompanyDetails() {
           <div>{companyLogo && <p>{companyLogo[0]?.name}</p>}</div>
         </div>
         <div className="border flex flex-col p-6 rounded-[14px]">
-          <p className="text-lg mb-3">4. Upload Front of your business card.</p>
+          <p className="text-lg mb-3">3. Upload Front of your business card.</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
             <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
             Add file
@@ -101,10 +178,11 @@ export default function CompanyDetails() {
               onChange={(e) => setBusinessCardFront(e.target.files)}
             />
           </label>
+          <div>{businessCardFront && <p>{businessCardFront[0]?.name}</p>}</div>
         </div>
         <div className="border flex flex-col p-6 rounded-[14px]">
           <p className="text-lg mb-3">
-            5. Upload Backside of your business card.
+            4. Upload Backside of your business card.
           </p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
             <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
@@ -116,13 +194,14 @@ export default function CompanyDetails() {
               onChange={(e) => setBusinessCardBack(e.target.files)}
             />
           </label>
+          <div>{businessCardBack && <p>{businessCardBack[0]?.name}</p>}</div>
         </div>
         <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">
-            6. Enter social media links, [Instagram]
+            5. Enter social media links, [Instagram]
           </label>
           <input
-            className="border-b-2 w-full mt-2 outline-none text-[#6B6B6B]"
+            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
             type="text"
             placeholder="Your answer"
             value={formData.company_instagram}
@@ -133,10 +212,10 @@ export default function CompanyDetails() {
         </div>
         <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">
-            7. Enter social media links, [Twitter]
+            6. Enter social media links, [Twitter]
           </label>
           <input
-            className="border-b-2 w-full mt-2 outline-none text-[#6B6B6B]"
+            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
             type="text"
             placeholder="Your answer"
             value={formData.company_twitter}
@@ -147,11 +226,11 @@ export default function CompanyDetails() {
         </div>
         <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">
-            8. Enter the Location of your company
+            7. Enter the Location of your company
           </label>
           <div className="flex w-full justify-between gap-3">
             <input
-              className="w-[80%] border-b-2 mt-2 outline-none text-[#6B6B6B]"
+              className="w-[80%] border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
               type="text"
               placeholder="Your answer"
               value={formData.company_address}
@@ -163,7 +242,7 @@ export default function CompanyDetails() {
               <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
               Add file
               <input
-                className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                className="border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
                 type="file"
                 style={{ display: "none" }}
                 onChange={(e) => setCompanyLocation(e.target.files)}
@@ -182,7 +261,7 @@ export default function CompanyDetails() {
             type="submit"
             className="bg-blue-500 text-white font-semibold rounded-[14px] px-8 py-2"
           >
-            Save & Continue
+            {isLoading ? "Saving..." : "Save & Continue"}
           </button>
         </div>
       </form>
