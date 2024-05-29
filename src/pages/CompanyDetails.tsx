@@ -136,7 +136,8 @@ export default function CompanyDetails() {
 
   const searchLocation = async (query: any) => {
     const client = new LocationClient({
-      region: import.meta.env.VITE_APP_AWS_REGION,
+      // region: import.meta.env.VITE_APP_AWS_REGION,
+      region: "ap-south-1",
       credentials: {
         accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_LOCATION,
         secretAccessKey: import.meta.env
@@ -145,7 +146,7 @@ export default function CompanyDetails() {
     });
 
     const params = {
-      IndexName: "MyPlaceIndex", // Replace with your Place Index Name
+      IndexName: "PlaceIndex1", // Replace with your Place Index Name
       Text: query,
       MaxResults: 5, // Limit the number of suggestions
     };
@@ -175,14 +176,15 @@ export default function CompanyDetails() {
   };
 
   const handleSuggestionClick = (suggestion: any) => {
-    const { Text, Place } = suggestion;
+    const { Place } = suggestion;
     const [Longitude, Latitude] = Place.Geometry.Point;
-
+    console.log(Latitude, Longitude);
+    console.log(suggestion);
     setFormData((prev) => ({
       ...prev,
-      company_address: Text,
-      latitude: Latitude,
-      longitude: Longitude,
+      company_address: Place.Label,
+      // latitude: Latitude,
+      // longitude: Longitude,
     }));
 
     setSuggestions([]);
@@ -348,14 +350,14 @@ export default function CompanyDetails() {
               onChange={handleAddressChange}
             />
             {suggestions.length > 0 && (
-              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
+              <ul className="absolute z-10 bg-white border border-gray-300 text-black rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
                 {suggestions.map((suggestion, index) => (
                   <li
                     key={index}
                     className="p-2 cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
-                    {suggestion.Text}
+                    {suggestion?.Place?.Label}
                   </li>
                 ))}
               </ul>
