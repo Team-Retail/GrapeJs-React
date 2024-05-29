@@ -4,8 +4,10 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const AppWrapper = () => (
   <BrowserRouter>
     <App />
-  </BrowserRouter>,
+  </BrowserRouter>
 );
+
+ReactDOM.createRoot(document.getElementById("root")!).render(<AppWrapper />);

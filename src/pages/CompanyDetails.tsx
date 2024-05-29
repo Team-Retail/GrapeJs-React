@@ -78,7 +78,7 @@ export default function CompanyDetails() {
         <div className="border flex flex-col p-6 rounded-[14px]">
           <p className="text-lg mb-3">3. Upload Company Logo</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload color="#1A72D3" />
+            <MdOutlineFileUpload type="image/*;capture=camera" color="#1A72D3" />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -92,7 +92,7 @@ export default function CompanyDetails() {
         <div className="border flex flex-col p-6 rounded-[14px]">
           <p className="text-lg mb-3">4. Upload Front of your business card.</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload color="#1A72D3" />
+            <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -107,7 +107,7 @@ export default function CompanyDetails() {
             5. Upload Backside of your business card.
           </p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload color="#1A72D3" />
+            <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -160,7 +160,7 @@ export default function CompanyDetails() {
               }
             />
             <label className="w-[20%] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-              <MdOutlineFileUpload color="#1A72D3" />
+              <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
               Add file
               <input
                 className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
