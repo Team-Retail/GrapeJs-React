@@ -43,14 +43,19 @@ export default function StylePropertyField({
   const [value, setValue] = React.useState('');
 
   const handleChange = (value: string) => {
-    prop.upValue(`${value}${unit}`);
+    const val = `${value}${unit}`
+    prop.upValue(val);
   };
 
   const onChange = (ev: any) => {
-    const inputValue = ev.target.value.replace(/[^\d.-]/g, ''); // Remove non-numeric characters
+    const inputValue = ev.target.value; // Remove non-numeric characters
+    // const parsedValue = parseFloat(inputValue);
+    // const val = Number.isInteger(parsedValue) ? `${parsedValue}${unit}` : `${parsedValue}${unit}`;
+    // console.log(inputValue, val);
+    // prop.upValue(val);
     setValue(inputValue);
-    handleChange(inputValue);
   };
+
 
   const handleUnitChange = (ev: any) => {
     setUnit(ev.target.value);
@@ -84,9 +89,10 @@ export default function StylePropertyField({
       onChange={onChange}
       size="small"
       fullWidth
+      className="!pr-0"
       InputProps={{
         endAdornment: (
-          <InputAdornment position="end">
+          <InputAdornment className="!pr-0" position="end" >
             <FormControl size="small" className="absolute right-0">
               <Select value={unit} onChange={handleUnitChange}>
                 {units.map((u) => (
@@ -96,7 +102,7 @@ export default function StylePropertyField({
                 ))}
               </Select>
             </FormControl>
-          </InputAdornment>
+          </InputAdornment >
         )
       }}
     />
