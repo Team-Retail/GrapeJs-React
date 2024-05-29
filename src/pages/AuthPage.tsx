@@ -36,6 +36,12 @@ export default function AuthPage() {
     try {
       const res = await axios.post(BASE_URL + "/login", signInData);
       console.log("Sign In Response:", res.data);
+      const user = res.data;
+      localStorage.setItem("userDetails", JSON.stringify(user));
+      localStorage.setItem(
+        "COMPANY_USERNAME",
+        res.data.companyName + "_" + res.data.firstName + res.data.lastName,
+      );
       resetForm();
       navigate("/editor");
     } catch (error) {
@@ -61,12 +67,12 @@ export default function AuthPage() {
     try {
       const res = await axios.post(BASE_URL + "/signup", signUpData);
       console.log("Sign Up Response:", res.data);
+      const user = res.data;
       localStorage.setItem(
         "COMPANY_USERNAME",
-        res.data.companyName + " " + res.data.firstName + res.data.lastName,
+        res.data.companyName + "_" + res.data.firstName + res.data.lastName,
       );
-      
-
+      localStorage.setItem("userDetails", JSON.stringify(user));
       resetForm();
       navigate("/company");
     } catch (error) {
