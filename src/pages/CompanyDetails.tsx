@@ -1,6 +1,10 @@
 import { useState, FormEvent, useRef } from "react";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+// import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
+// import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
+import { LocationClient } from "@aws-sdk/client-location";
+import { SearchPlaceIndexForTextCommand } from "@aws-sdk/client-location";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -24,8 +28,24 @@ export default function CompanyDetails() {
     companyLocationUrl: "",
   });
 
+  // const [query, setQuery] = useState("");
+  // const [loading, setLoading] = useState(false);
+
+  const [suggestions, setSuggestions] = useState([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const ref = useRef(Date.now());
+
+  // const REGION = "YOUR_REGION"; // e.g., us-west-2
+  // const IDENTITY_POOL_ID = "YOUR_IDENTITY_POOL_ID";
+
+  // const client = new LocationClient({
+  //   region: REGION,
+  //   credentials: fromCognitoIdentityPool({
+  //     client: new CognitoIdentityClient({ region: REGION }),
+  //     identityPoolId: IDENTITY_POOL_ID,
+  //   }),
+  // });
 
   const s3Client = new S3Client({
     region: import.meta.env.VITE_APP_AWS_REGION,
@@ -88,6 +108,84 @@ export default function CompanyDetails() {
     }
 
     setIsLoading(false);
+  };
+
+  // const handleAddressChange = async (e: FormEvent<HTMLInputElement>) => {
+  //   const value = e.currentTarget.value;
+  //   setQuery(value);
+  //   if (value.length < 3) {
+  //     setSuggestions([]);
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   try {
+  //     const response = await client.send(
+  //       new SearchPlaceIndexForTextCommand({
+  //         IndexName: "YourPlaceIndexName",
+  //         Text: value,
+  //       }),
+  //     );
+  //     setSuggestions(response.Results || []);
+  //   } catch (error) {
+  //     console.error("Error searching for place:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const searchLocation = async (query: any) => {
+    const client = new LocationClient({
+      region: import.meta.env.VITE_APP_AWS_REGION,
+      credentials: {
+        accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_LOCATION,
+        secretAccessKey: import.meta.env
+          .VITE_APP_AWS_SECRET_ACCESS_KEY_ID_LOCATION,
+      },
+    });
+
+    const params = {
+      IndexName: "MyPlaceIndex", // Replace with your Place Index Name
+      Text: query,
+      MaxResults: 5, // Limit the number of suggestions
+    };
+
+    try {
+      const response = await client.send(
+        new SearchPlaceIndexForTextCommand(params),
+      );
+      if (response && response?.Results) {
+        setSuggestions(response?.Results);
+      } else {
+        setSuggestions([]);
+      }
+    } catch (error) {
+      console.error("Error searching location:", error);
+    }
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const address = e.target.value;
+    setFormData((prev) => ({ ...prev, company_address: address }));
+    if (address.length > 2) {
+      searchLocation(address);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: any) => {
+    const { Text, Place } = suggestion;
+    const [Longitude, Latitude] = Place.Geometry.Point;
+
+    setFormData((prev) => ({
+      ...prev,
+      company_address: Text,
+      latitude: Latitude,
+      longitude: Longitude,
+    }));
+
+    setSuggestions([]);
   };
 
   const submitForm = async () => {
@@ -155,7 +253,10 @@ export default function CompanyDetails() {
         <div className="border flex flex-col p-6 rounded-[14px]">
           <p className="text-lg mb-3">2. Upload Company Logo</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload type="image/*;capture=camera" color="#1A72D3" />
+            <MdOutlineFileUpload
+              type="image/*;capture=camera"
+              color="#1A72D3"
+            />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -169,7 +270,10 @@ export default function CompanyDetails() {
         <div className="border flex flex-col p-6 rounded-[14px]">
           <p className="text-lg mb-3">3. Upload Front of your business card.</p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
+            <MdOutlineFileUpload
+              color="#1A72D3"
+              type="image/*;capture=camera"
+            />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -185,7 +289,10 @@ export default function CompanyDetails() {
             4. Upload Backside of your business card.
           </p>
           <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
+            <MdOutlineFileUpload
+              color="#1A72D3"
+              type="image/*;capture=camera"
+            />
             Add file
             <input
               className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
@@ -230,16 +337,34 @@ export default function CompanyDetails() {
           </label>
           <div className="flex w-full justify-between gap-3">
             <input
+              // id="company_address"
               className="w-[80%] border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
               type="text"
               placeholder="Your answer"
               value={formData.company_address}
-              onChange={(e) =>
-                setFormData({ ...formData, company_address: e.target.value })
-              }
+              // onChange={(e) =>
+              //   setFormData({ ...formData, company_address: e.target.value })
+              // }
+              onChange={handleAddressChange}
             />
-            <label className="w-[20%] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-              <MdOutlineFileUpload color="#1A72D3" type="image/*;capture=camera" />
+            {suggestions.length > 0 && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion.Text}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {/* <label className="w-[20%] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+              <MdOutlineFileUpload
+                color="#1A72D3"
+                type="image/*;capture=camera"
+              />
               Add file
               <input
                 className="border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
@@ -247,7 +372,7 @@ export default function CompanyDetails() {
                 style={{ display: "none" }}
                 onChange={(e) => setCompanyLocation(e.target.files)}
               />
-            </label>
+            </label> */}
           </div>
         </div>
         <div className="mt-4 flex flex-row justify-between">
