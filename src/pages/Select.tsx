@@ -5,7 +5,8 @@ import frame3 from "../assets/frame3.png";
 import axios from "axios";
 import { Template1, Template2 } from "../utils/template";
 import { useNavigate } from "react-router-dom";
-const saveJsonApiUrl = "http://13.235.16.143:3000/api/auth/save-json";
+import { getBaseUrl } from "../utils/base";
+const saveJsonApiUrl = getBaseUrl() + "/api/auth/save-json";
 
 
 const Select: React.FC = () => {
@@ -16,9 +17,9 @@ const Select: React.FC = () => {
     setSelectedFrame(frame);
   };
 
-  const handleButtonClick = async()=>{
+  const handleButtonClick = async () => {
     console.log("button click")
-    if(!selectedFrame){
+    if (!selectedFrame) {
       alert("select frame")
     }
     // @ts-ignore
@@ -26,9 +27,9 @@ const Select: React.FC = () => {
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
     const response = await axios.post(saveJsonApiUrl, {
       userId,
-      JSONString: JSON.stringify(selectedFrame ==="frame1"?Template1:Template2),
+      JSONString: JSON.stringify(selectedFrame === "frame1" ? Template1 : Template2),
     });
-    if(response.status===201){
+    if (response.status === 201) {
       navigate("/editor")
     }
 
@@ -58,7 +59,7 @@ const Select: React.FC = () => {
         </div>
       </div>
       {selectedFrame && (
-        <button disabled={selectedFrame===null} onClick={handleButtonClick} className="mt-[40px] px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px]">
+        <button disabled={selectedFrame === null} onClick={handleButtonClick} className="mt-[40px] px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px]">
           Continue
         </button>
       )}

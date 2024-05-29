@@ -21,6 +21,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import Modal from "@mui/material/Modal";
 import QRCode from "qrcode.react";
 import axios from "axios";
+import { getBaseUrl } from "../utils/base.ts";
 
 // @ts-ignore
 const generateRandomAlphanumeric = (length) => {
@@ -51,7 +52,7 @@ const style = {
 };
 // @ts-ignore
 
-export default function TopbarButtons({className,  setSidebarState,}: React.HTMLAttributes<HTMLDivElement>) {
+export default function TopbarButtons({ className, setSidebarState, }: React.HTMLAttributes<HTMLDivElement>) {
   const editor = useEditor();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
@@ -120,7 +121,7 @@ export default function TopbarButtons({className,  setSidebarState,}: React.HTML
 
       const bucketName = import.meta.env.VITE_APP_AWS_BUCKET_NAME;
       console.log(ref.current);
-      const htmlFilename = `${usernameFolder||"common"}/template-${ref.current}.html`;
+      const htmlFilename = `${usernameFolder || "common"}/template-${ref.current}.html`;
 
       // Upload the HTML file
       const resp = await s3Client.send(
@@ -144,7 +145,7 @@ export default function TopbarButtons({className,  setSidebarState,}: React.HTML
 
 
       // Send the data to the remote server
-      const ress = await axios.post("http://13.235.16.143:3000/api/auth/content", {
+      const ress = await axios.post(getBaseUrl() + "/api/auth/content", {
         URL: url,
         userId,
         code: code.toString(),
@@ -262,7 +263,7 @@ export default function TopbarButtons({className,  setSidebarState,}: React.HTML
               // MAIN_BORDER_COLOR,
               id !== "core:upload" && "rounded text-[#000000B8] p-2",
               id === "core:upload" &&
-                "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
+              "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
               activeTab === id && "text-[#1D85E6] bg-[#D1EAFF]",
               // Commands.isActive(id) && "text-[#1D85E6]",
               disabled?.() && "opacity-50",

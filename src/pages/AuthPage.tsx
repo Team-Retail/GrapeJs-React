@@ -3,6 +3,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiMail } from "react-icons/ci";
 import { CiLock } from "react-icons/ci";
+import { getBaseUrl } from "../utils/base";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export default function AuthPage() {
       [id]: value,
     }));
   };
-  const BASE_URL = "http://13.235.16.143:3000/api/auth";
+  const BASE_URL = getBaseUrl() + "/api/auth";
 
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

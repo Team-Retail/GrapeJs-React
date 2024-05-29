@@ -12,6 +12,7 @@ import CustomModal from "../components/CustomModal.tsx";
 import SidebarContent from "../components/SidebarContent.tsx";
 import Topbar from "../components/Topbar.tsx";
 import { MAIN_BORDER_COLOR } from "../components/common.ts";
+import { getBaseUrl } from "../utils/base.ts";
 
 const theme = createTheme({
   palette: {
@@ -20,8 +21,8 @@ const theme = createTheme({
 });
 
 
-const saveJsonApiUrl = "http://13.235.16.143:3000/api/auth/save-json";
-const getJsonApiUrl = "http://13.235.16.143:3000/api/auth/get-json/";
+const saveJsonApiUrl = getBaseUrl() + "/api/auth/save-json";
+const getJsonApiUrl = getBaseUrl() + "/api/auth/get-json/";
 
 // Function to save data to remote server
 // @ts-ignore
@@ -50,7 +51,7 @@ const loadData = async () => {
 
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
 
-    const response = await axios.get(getJsonApiUrl+userId );
+    const response = await axios.get(getJsonApiUrl + userId);
     // if(response.status===201){
 
     // }
@@ -65,10 +66,10 @@ const loadData = async () => {
 
 const gjsOptions = {
   height: "100vh",
-  storageManager:{
-    type:'remote',
+  storageManager: {
+    type: 'remote',
   },
-  
+
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true },
   styleManager: {
@@ -145,12 +146,12 @@ const editorPlugins = (editor) => {
 
 
   });
-  
 
-  
+
+
 
   // Custom save action
-  
+
 };
 
 export default function GrapeJSPage() {
@@ -171,7 +172,7 @@ export default function GrapeJSPage() {
     editor.Storage.add('remote', {
       async load() {
         const initialData = await loadData();
-        console.log("initialData",initialData)
+        console.log("initialData", initialData)
         return initialData;
       },
       // @ts-ignore
@@ -183,7 +184,7 @@ export default function GrapeJSPage() {
       },
     });
 
-    
+
   };
 
   const [activeTab, setActiveTab] = React.useState<string | null>(null);

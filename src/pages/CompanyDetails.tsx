@@ -5,6 +5,7 @@ import { LocationClient } from "@aws-sdk/client-location";
 import { SearchPlaceIndexForTextCommand } from "@aws-sdk/client-location";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { getBaseUrl } from "../utils/base";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -40,7 +41,7 @@ export default function CompanyDetails() {
   const companyLogoUrlRef = useRef("");
   const businessCardFrontUrlRef = useRef("");
   const businessCardBackUrlRef = useRef("");
-  const BASE_URL = "http://13.235.16.143:3000/api/auth";
+  const BASE_URL = getBaseUrl() + "/api/auth";
   const [isLoading, setIsLoading] = useState(false);
   const ref = useRef(Date.now());
 
