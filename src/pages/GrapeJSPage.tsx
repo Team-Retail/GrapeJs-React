@@ -21,36 +21,104 @@ const theme = createTheme({
 const gjsOptions: EditorConfig = {
   height: "100vh",
   storageManager: {
-    type: "local", // Type of the storage, available: 'local' | 'remote'
-    autosave: true, // Store data automatically
-    autoload: true, // Autoload stored data on init
-    stepsBeforeSave: 1, // If autosave enabled, indicates how many changes are necessary before store method is triggered
+    type: 'local',
     options: {
-      local: {
-        // Options for the `local` type
-        key: "gjsProject", // The key for the local storage
-      },
-    },
+      local: { key: `gjsProject` }
+    }
   },
 
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true },
-  projectData: {
-    assets: [
-      "https://via.placeholder.com/350x250/78c5d6/fff",
-      "https://via.placeholder.com/350x250/459ba8/fff",
-      "https://via.placeholder.com/350x250/79c267/fff",
-      "https://via.placeholder.com/350x250/c5d647/fff",
-      "https://via.placeholder.com/350x250/f28c33/fff",
-    ],
-    pages: [
-      {
-        name: "Home page",
-        component: `<h1>GrapesJS React Custom UI</h1>`,
-      },
-    ],
-  },
+  
 };
+
+// const obj: any = {
+//   "assets": [
+//     {
+//       "type": "image",
+//       "src": "https://via.placeholder.com/350x250/78c5d6/fff",
+//       "unitDim": "px",
+//       "height": 0,
+//       "width": 0
+//     },
+//     {
+//       "type": "image",
+//       "src": "https://via.placeholder.com/350x250/459ba8/fff",
+//       "unitDim": "px",
+//       "height": 0,
+//       "width": 0
+//     },
+//     {
+//       "type": "image",
+//       "src": "https://via.placeholder.com/350x250/79c267/fff",
+//       "unitDim": "px",
+//       "height": 0,
+//       "width": 0
+//     },
+//     {
+//       "type": "image",
+//       "src": "https://via.placeholder.com/350x250/c5d647/fff",
+//       "unitDim": "px",
+//       "height": 0,
+//       "width": 0
+//     },
+//     {
+//       "type": "image",
+//       "src": "https://via.placeholder.com/350x250/f28c33/fff",
+//       "unitDim": "px",
+//       "height": 0,
+//       "width": 0
+//     }
+//   ],
+//   "styles": [
+//     {
+//       "selectors": [
+//         "#islg"
+//       ],
+//       "style": {
+//         "float": "right"
+//       }
+//     }
+//   ],
+//   "pages": [
+//     {
+//       "name": "Home page",
+//       "frames": [
+//         {
+//           "component": {
+//             "type": "wrapper",
+//             "stylable": [
+//               "background",
+//               "background-color",
+//               "background-image",
+//               "background-repeat",
+//               "background-attachment",
+//               "background-position",
+//               "background-size"
+//             ],
+//             "components": [
+//               {
+//                 "tagName": "h1",
+//                 "type": "text",
+//                 "attributes": {
+//                   "id": "islg"
+//                 },
+//                 "components": [
+//                   {
+//                     "type": "textnode",
+//                     "content": "Hello there!!"
+//                   }
+//                 ]
+//               }
+//             ]
+//           },
+//           "id": "vsyLHAOecDtqvwGe"
+//         }
+//       ],
+//       "id": "I2iY6oHbcSsP2ZqR"
+//     }
+//   ]
+// }
 
 export default function GrapeJSPage() {
   const onEditor = (editor) => {

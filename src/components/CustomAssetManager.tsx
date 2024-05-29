@@ -1,4 +1,3 @@
-import * as React from "react";
 import { AssetsResultProps, useEditor } from "@grapesjs/react";
 import { mdiClose } from "@mdi/js";
 import Icon from "@mdi/react";
