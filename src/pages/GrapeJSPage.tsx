@@ -13,6 +13,7 @@ import Topbar from "../components/Topbar.tsx";
 import RightSidebar from "../components/RightSidebar.tsx";
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS
 import SidebarContent from "../components/SidebarContent.tsx";
+import { Template1 } from "../utils/template.ts";
 
 const theme = createTheme({
   palette: {
@@ -77,6 +78,7 @@ const tailwindClasses = [
   // Add more Tailwind CSS classes as needed
 ];
 
+console.log(JSON.stringify(Template1))
 const editorPlugins = (editor) => {
   // Load Tailwind classes into style manager
   const styleManager = editor.StyleManager;
