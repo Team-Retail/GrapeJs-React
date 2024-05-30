@@ -33,6 +33,10 @@ const generateRandomAlphanumeric = (length) => {
   }
   return result;
 };
+
+interface TopbarButtonsProps extends React.HTMLAttributes<HTMLDivElement> {
+  setSidebarState: (state: string) => void;
+}
 interface CommandButton {
   id: string;
   iconPath: string;
@@ -56,7 +60,7 @@ const style = {
 export default function TopbarButtons({
   className,
   setSidebarState,
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: TopbarButtonsProps) {
   const editor = useEditor();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
