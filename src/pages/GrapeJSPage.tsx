@@ -15,7 +15,7 @@ import { MAIN_BORDER_COLOR } from "../components/common.ts";
 import { getBaseUrl } from "../utils/base.ts";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import 'slick-carousel/slick/slick.min.js';
+// import 'slick-carousel/slick/slick.min.js';
 
 const theme = createTheme({
   palette: {
@@ -169,15 +169,7 @@ const editorPlugins = (editor) => {
         }
       </style>
       <script>
-        $(document).ready(function(){
-          $('.carousel').slick({
-            dots: true,
-            infinite: true,
-            speed: 500,
-            slidesToShow: 1,
-            slidesToScroll: 1
-          });
-        });
+       
       </script>
     `,
     category: 'Basic',
