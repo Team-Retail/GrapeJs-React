@@ -44,7 +44,7 @@ export default function AuthPage() {
         res.data.companyName + "_" + res.data.firstName + res.data.lastName,
       );
       resetForm();
-      navigate("/editor");
+      navigate("/select");
     } catch (error) {
       console.error("Sign In Error:", error);
     }

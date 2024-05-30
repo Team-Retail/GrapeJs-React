@@ -19,8 +19,32 @@ export default function CustomAssetManager({
     editor.Assets.remove(asset);
   };
 
+  const addAsset = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        editor.Assets.add({ src: dataUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="grid grid-cols-3 gap-2 pr-2">
+      <div className="relative group rounded overflow-hidden border-dashed border-2 border-gray-300 flex items-center justify-center">
+        <input
+          type="file"
+          className="absolute inset-0 opacity-0 cursor-pointer"
+          onChange={addAsset}
+          accept="image/*"
+        />
+        <div className="text-center">
+          <p>Click to upload an image</p>
+        </div>
+      </div>
       {assets.map((asset) => (
         <div
           key={asset.getSrc()}

@@ -16,7 +16,7 @@ import CustomTraitManager from "./CustomTraitManager.tsx";
 // Define a new component for the sidebar content
 function SidebarContent({ activeTab }: { activeTab: string | null }) {
   return (
-    <div className="bg-[#DEF1FF] flex flex-col text-[#053663] fixed top-[16vh] right-8 h-[80%] w-[300px] m-4 rounded-xl p-4 z-50 overflow-y-auto flex-grow">
+    <div className="bg-[#DEF1FF] flex flex-col text-[#053663] fixed top-[16vh] right-8 h-[80%] w-[300px] m-4 rounded-xl p-4 overflow-y-auto flex-grow">
       {/* {activeTab === ("core:brush" || null) && ( */}
       <>
         <SelectorsProvider>

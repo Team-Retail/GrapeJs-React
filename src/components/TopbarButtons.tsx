@@ -10,6 +10,7 @@ import {
   mdiViewGridPlus,
   mdiTextBoxMultiple,
   mdiCog,
+  mdiImage,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import Box from "@mui/material/Box";
@@ -25,8 +26,8 @@ import { getBaseUrl } from "../utils/base.ts";
 
 // @ts-ignore
 const generateRandomAlphanumeric = (length) => {
-  const characters = '0123456789';
-  let result = '';
+  const characters = "0123456789";
+  let result = "";
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
@@ -52,15 +53,18 @@ const style = {
 };
 // @ts-ignore
 
-export default function TopbarButtons({ className, setSidebarState, }: React.HTMLAttributes<HTMLDivElement>) {
+export default function TopbarButtons({
+  className,
+  setSidebarState,
+}: React.HTMLAttributes<HTMLDivElement>) {
   const editor = useEditor();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
   const { UndoManager, Commands } = editor;
   const [isLoading, setisLoading] = useState(false);
   const ref = React.useRef<string>();
-  const [coded, setCoded] = useState("")
-
+  const [coded, setCoded] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   useEffect(() => {
@@ -138,11 +142,10 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
       const url = `https://${bucketName}.s3.${import.meta.env.VITE_APP_AWS_REGION}.amazonaws.com/${htmlFilename}`;
 
       const code = generateRandomAlphanumeric(6);
-      console.log(code)
+      console.log(code);
       // @ts-ignore
 
       const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
-
 
       // Send the data to the remote server
       const ress = await axios.post(getBaseUrl() + "/api/auth/content", {
@@ -152,7 +155,7 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
       });
 
       // Set the URL in the state variable
-      setCoded(code)
+      setCoded(code);
       setUrl(url);
       setOpen(true);
     } catch (error) {
@@ -160,6 +163,23 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
       alert("Failed to upload file.");
     } finally {
       setisLoading(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        editor.Assets.add({ src: dataUrl });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -178,6 +198,10 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
       id: "core:undo",
       iconPath: mdiArrowULeftTop,
       disabled: () => !UndoManager.hasUndo(),
+    },
+    {
+      id: "core:image",
+      iconPath: mdiImage,
     },
     {
       id: "core:brush",
@@ -228,10 +252,25 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
     editor.Commands.add("core:upload", {
       run: handleUpload,
     });
+    editor.Commands.add("core:image", {
+      run: () => {
+        const inputElement = document.getElementById(
+          "imageUploadInput",
+        ) as HTMLInputElement;
+        inputElement?.click();
+      },
+    });
   }, [editor]);
 
   return (
     <div className={cx("flex flex-row gap-3", className)}>
+      <input
+        type="file"
+        id="imageUploadInput"
+        style={{ display: "none" }}
+        accept="image/*"
+        onChange={handleImageUpload}
+      />
       <Modal
         open={open}
         onClose={() => {
@@ -242,7 +281,9 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
       >
         <Box sx={style} className="w-full flex flex-col gap-6 !pt-8 rounded-lg">
           <QRCode value={url} className="!w-60  !h-60 mx-auto" />
-          <p className="text-center tracking-widest p-2 bg-black text-white rounded-lg w-fit mx-auto font-bold">{coded}</p>
+          <p className="text-center tracking-widest p-2 bg-black text-white rounded-lg w-fit mx-auto font-bold">
+            {coded}
+          </p>
           <a
             href={url}
             target="_blank"
@@ -263,7 +304,7 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
               // MAIN_BORDER_COLOR,
               id !== "core:upload" && "rounded text-[#000000B8] p-2",
               id === "core:upload" &&
-              "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
+                "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
               activeTab === id && "text-[#1D85E6] bg-[#D1EAFF]",
               // Commands.isActive(id) && "text-[#1D85E6]",
               disabled?.() && "opacity-50",
@@ -284,6 +325,11 @@ export default function TopbarButtons({ className, setSidebarState, }: React.HTM
           </button>
         ))}
       </div>
+      {showAlert && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded shadow-lg z-50">
+          Image has been added
+        </div>
+      )}
     </div>
   );
 }
