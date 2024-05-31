@@ -15,6 +15,7 @@ import { MAIN_BORDER_COLOR } from "../components/common.ts";
 import { getBaseUrl } from "../utils/base.ts";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { Template1, Template2 } from "../utils/template.ts";
 // import 'slick-carousel/slick/slick.min.js';
 
 const theme = createTheme({
@@ -201,7 +202,10 @@ export default function GrapeJSPage() {
       async load() {
         const initialData = await loadData();
         console.log("initialData", initialData)
-        return initialData;
+
+        
+
+        return Template1;
       },
       // @ts-ignore
 
