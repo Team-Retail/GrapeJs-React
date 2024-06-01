@@ -13,10 +13,14 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Select from "../components/Select.tsx";
+<<<<<<< HEAD
 import backImg from "../assets/backImg.png"
 import { BASE_URL } from "../utils/base.ts";
 
 const getJsonApiUrl = BASE_URL + "/api/auth/get-json/";
+=======
+import useTimeout from "../utils/useTimeout.ts";
+>>>>>>> b6fccd750e3227eb8242e41ea8dbb98826f9c2e0
 
 export default function CompanyDetails() {
   const [modalOpen, setModalOpen] = useState(true);
@@ -71,7 +75,9 @@ export default function CompanyDetails() {
   const [isLoading, setIsLoading] = useState(false);
   const ref = useRef(Date.now());
 
-
+  useTimeout(() => {
+    setModalOpen(true);
+  }, 1000);
 
   const s3Client = new S3Client({
     region: import.meta.env.VITE_APP_AWS_REGION,
@@ -269,153 +275,163 @@ export default function CompanyDetails() {
 
         }       
       }>
-        <Box sx={style} className={"bg-white rounded-lg !mx-auto  w-full !max-w-7xl h-[80vh]  p-12"}>
+        <Box sx={style} className={"bg-white rounded-lg !mx-auto  w-full !max-w-6xl h-[80vh]  p-12"}>
           <Stepper steps={[{}, {}, {}]} initialStep={0} variant={"line"}>
-            
             <Step label={"Enter company details"}>
-              <div>
-                <div className="flex flex-col p-6 w-full rounded-[14px]">
-                  <label className="text-lg">
-                    1. Please enter your Company website link
-                  </label>
-                  <input
-                    className="border-[1.5px] px-4 py-2 rounded-xl w-full mt-2 outline-none text-[#6B6B6B]"
-                    type="text"
-                    placeholder="Enter website link"
-                    value={formData.company_website}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company_website: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="flex flex-col p-6 rounded-[14px]">
-                  <p className="text-lg mb-3">2. Upload Company Logo</p>
-                  <label
-                    className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-                    <MdOutlineFileUpload
-                      type="image/*;capture=camera"
-                      color="#1A72D3"
-                    />
-                    Front side
+              <div className={"flex flex-col justify-between py-10 h-full"}>
+                <div>
+                  <div className="flex flex-col p-6 w-full rounded-[14px]">
+                    <label className="text-lg">
+                      1. Please enter your Company website link
+                    </label>
                     <input
-                      className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
-                      type="file"
-                      style={{ display: "none" }}
-                      onChange={(e) => setCompanyLogo(e.target.files)}
+                      className="border-[1.5px] px-4 py-2 rounded-xl w-full mt-2 outline-none text-[#6B6B6B]"
+                      type="text"
+                      placeholder="Enter website link"
+                      value={formData.company_website}
+                      onChange={(e) =>
+                        setFormData({ ...formData, company_website: e.target.value })
+                      }
                     />
-                  </label>
-                  <div>{companyLogo && <p>{companyLogo[0]?.name}</p>}</div>
-                </div>
-                <div className="flex flex-col p-6 rounded-[14px]">
-                  <p className="text-lg mb-3">3. Upload Front & back of your business card.</p>
-                  <div className={"flex gap-x-3"}>
+                  </div>
+                  <div className="flex flex-col p-6 rounded-[14px]">
+                    <p className="text-lg mb-3">2. Upload Company Logo</p>
                     <label
                       className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
                       <MdOutlineFileUpload
-                        color="#1A72D3"
                         type="image/*;capture=camera"
+                        color="#1A72D3"
                       />
                       Front side
                       <input
                         className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
                         type="file"
                         style={{ display: "none" }}
-                        onChange={(e) => setBusinessCardFront(e.target.files)}
+                        onChange={(e) => setCompanyLogo(e.target.files)}
                       />
                     </label>
-                    <label
-                      className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-                      <MdOutlineFileUpload
-                        color="#1A72D3"
-                        type="image/*;capture=camera"
-                      />
-                      Back side
-                      <input
-                        className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={(e) => setBusinessCardBack(e.target.files)}
-                      />
-                    </label>
+                    <div>{companyLogo && <p>{companyLogo[0]?.name}</p>}</div>
                   </div>
-                  <div>{businessCardFront && <p>{businessCardFront[0]?.name}</p>}</div>
-                  <div>{businessCardBack && <p>{businessCardBack[0]?.name}</p>}</div>
+                  <div className="flex flex-col p-6 rounded-[14px]">
+                    <p className="text-lg mb-3">3. Upload Front & back of your business card.</p>
+                    <div className={"flex gap-x-3"}>
+                      <label
+                        className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+                        <MdOutlineFileUpload
+                          color="#1A72D3"
+                          type="image/*;capture=camera"
+                        />
+                        Front side
+                        <input
+                          className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                          type="file"
+                          style={{ display: "none" }}
+                          onChange={(e) => setBusinessCardFront(e.target.files)}
+                        />
+                      </label>
+                      <label
+                        className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+                        <MdOutlineFileUpload
+                          color="#1A72D3"
+                          type="image/*;capture=camera"
+                        />
+                        Back side
+                        <input
+                          className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                          type="file"
+                          style={{ display: "none" }}
+                          onChange={(e) => setBusinessCardBack(e.target.files)}
+                        />
+                      </label>
+                    </div>
+                    <div>{businessCardFront && <p>{businessCardFront[0]?.name}</p>}</div>
+                    <div>{businessCardBack && <p>{businessCardBack[0]?.name}</p>}</div>
+                  </div>
                 </div>
-              </div>
-              <div className={"flex items-center justify-center"}>
-                <StepperNext>
-                  <Button variant={"contained"}>Save & Next</Button>
-                </StepperNext>
+                <div className={"flex items-center justify-center"}>
+                  <StepperNext>
+                    <Button variant={"contained"}>Save & Next</Button>
+                  </StepperNext>
+                </div>
               </div>
             </Step>
             <Step label={"Enter other details"}>
-              <div className="flex flex-col p-6 w-full rounded-[14px]">
-                <label className="text-lg">
-                  5. Enter social media links, [Instagram]
-                </label>
-                <input
-                  className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
-                  type="text"
-                  placeholder="Enter link"
-                  value={formData.company_instagram}
-                  onChange={(e) =>
-                    setFormData({ ...formData, company_instagram: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex flex-col p-6 w-full rounded-[14px]">
-                <label className="text-lg">
-                  6. Enter social media links, [Twitter]
-                </label>
-                <input
-                  className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
-                  type="text"
-                  placeholder="Enter link"
-                  value={formData.company_twitter}
-                  onChange={(e) =>
-                    setFormData({ ...formData, company_twitter: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex flex-col p-6 w-full rounded-[14px]">
-                <label className="text-lg">
-                  7. Enter the Location of your company
-                </label>
-                <div className="flex w-full justify-between gap-3">
-                  <input
-                    className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
-                    type="text"
-                    placeholder="Enter location"
-                    value={formData.company_address}
+              <div className={"flex flex-col justify-between py-10 h-full"}>
+                <div className={"grid grid-cols-2 gap-x-5"}>
+                  <div>
+                    <div className="flex flex-col p-6 w-full rounded-[14px]">
+                      <label className="text-lg">
+                        5. Enter social media links, [Instagram]
+                      </label>
+                      <input
+                        className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                        type="text"
+                        placeholder="Enter link"
+                        value={formData.company_instagram}
+                        onChange={(e) =>
+                          setFormData({ ...formData, company_instagram: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="flex flex-col p-6 w-full rounded-[14px]">
+                      <label className="text-lg">
+                        6. Enter social media links, [Twitter]
+                      </label>
+                      <input
+                        className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                        type="text"
+                        placeholder="Enter link"
+                        value={formData.company_twitter}
+                        onChange={(e) =>
+                          setFormData({ ...formData, company_twitter: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="flex flex-col p-6 w-full rounded-[14px]">
+                      <label className="text-lg">
+                        7. Enter the Location of your company
+                      </label>
+                      <div className="flex w-full justify-between gap-3">
+                        <input
+                          className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                          type="text"
+                          placeholder="Enter location"
+                          value={formData.company_address}
 
-                    onChange={handleAddressChange}
-                  />
-                  {suggestions.length > 0 && (
-                    <ul
-                      className="absolute z-10 bg-white border border-gray-300 text-black rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
-                      {suggestions.map((suggestion, index) => (
-                        <li
-                          key={index}
-                          className="p-2 cursor-pointer hover:bg-gray-200"
-                          onClick={() => handleSuggestionClick(suggestion)}
-                        >
-                          {/* @ts-ignore */}
-                          {suggestion?.Place?.Label}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                          onChange={handleAddressChange}
+                        />
+                        {suggestions.length > 0 && (
+                          <ul
+                            className="absolute z-10 bg-white border border-gray-300 text-black rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
+                            {suggestions.map((suggestion, index) => (
+                              <li
+                                key={index}
+                                className="p-2 cursor-pointer hover:bg-gray-200"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                              >
+                                {/* @ts-ignore */}
+                                {suggestion?.Place?.Label}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={"flex items-center justify-center"}>
+                    <img src={"other_details.png"} alt="map" />
+                  </div>
+                </div>
+                <div className={"flex items-center justify-center"}>
+                  <StepperNext>
+                    <Button variant={"contained"}>Save & Next</Button>
+                  </StepperNext>
                 </div>
               </div>
-              <StepperNext>
-                <Button variant={"contained"}>Save & Next</Button>
-              </StepperNext>
             </Step>
             <Step label={"Choose template"}>
               <Select />
-
             </Step>
-            
           </Stepper>
         </Box>
       </Modal>

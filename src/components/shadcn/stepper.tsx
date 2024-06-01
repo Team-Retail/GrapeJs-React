@@ -586,10 +586,14 @@ const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
         data-active={active}
         data-clickable={clickable || !!onClickStep}
         data-invalid={localIsError}
-        onClick={() =>
-          onClickStep?.(index || 0, setStep) ||
-          onClickStepGeneral?.(index || 0, setStep)
-        }
+        onClick={() => {
+          const stepIndex = index;
+          if (onClickStep) {
+            onClickStep(stepIndex, setStep);
+          } else if (onClickStepGeneral) {
+            onClickStepGeneral(stepIndex, setStep);
+          }
+        }}
       >
         <div
           data-vertical={true}
@@ -686,6 +690,7 @@ const HorizontalStep = React.forwardRef<HTMLDivElement, StepSharedProps>(
     return (
       <div
         aria-disabled={!hasVisited}
+        aria-current={isCurrentStep}
         className={cn(
           "stepper__horizontal-step",
           "flex items-center relative transition-all duration-200",
@@ -699,7 +704,8 @@ const HorizontalStep = React.forwardRef<HTMLDivElement, StepSharedProps>(
           variant === "circle" &&
           "[&:not(:last-child)]:after:flex-1 [&:not(:last-child)]:after:ms-[var(--step-gap)] [&:not(:last-child)]:after:me-[var(--step-gap)]",
           variant === "line" &&
-          "flex-col flex-1 border-b-[3px] data-[active=true]:border-primary",
+          "flex-col flex-1 border-b-[3px]",
+          "aria-[current=true]:border-primary",
           styles?.["horizontal-step"]
         )}
         data-optional={steps[index || 0]?.optional}
@@ -989,7 +995,8 @@ const StepLabel = ({
         variant === "circle-alt" && orientation === "horizontal" && "ms-0",
         variant === "circle-alt" && orientation === "vertical" && "text-start",
         styles?.["step-label-container"],
-        "font-semibold text-primary"
+        isCurrentStep && "text-primary" || "text-muted-foreground",
+        "font-semibold"
       )}
       style={{
         opacity,
