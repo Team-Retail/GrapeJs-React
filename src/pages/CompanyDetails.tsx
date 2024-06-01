@@ -229,7 +229,7 @@ export default function CompanyDetails() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    
+    borderRadius:"15px"
    
   };
 
@@ -241,7 +241,7 @@ export default function CompanyDetails() {
         clearForm();
         
       }}>
-        <Box sx={style} className={"bg-white !mx-auto  w-full !max-w-7xl h-[80vh]  p-12"}>
+        <Box sx={style} className={"bg-white rounded-lg !mx-auto  w-full !max-w-7xl h-[80vh]  p-12"}>
           <Stepper steps={[{}, {}, {}]} initialStep={0} variant={"line"}>
             
             <Step label={"Enter company details"}>
