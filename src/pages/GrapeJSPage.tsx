@@ -12,7 +12,6 @@ import CustomModal from "../components/CustomModal.tsx";
 import SidebarContent from "../components/SidebarContent.tsx";
 import Topbar from "../components/Topbar.tsx";
 import { MAIN_BORDER_COLOR } from "../components/common.ts";
-import { BASE_URL } from "../utils/base.ts";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Template1, Template2 } from "../utils/template.ts";

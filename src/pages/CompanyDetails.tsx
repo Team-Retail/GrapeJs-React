@@ -1,4 +1,4 @@
-import { useState, FormEvent, useRef } from "react";
+import { useState, FormEvent, useRef, useEffect } from "react";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { LocationClient } from "@aws-sdk/client-location";
@@ -13,9 +13,13 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Select from "../components/Select.tsx";
+import backImg from "../assets/backImg.png"
+import { BASE_URL } from "../utils/base.ts";
+
+const getJsonApiUrl = BASE_URL + "/api/auth/get-json/";
 
 export default function CompanyDetails() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true);
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
   const [businessCardFront, setBusinessCardFront] = useState<FileList | null>(
     null,
@@ -24,6 +28,28 @@ export default function CompanyDetails() {
     null,
   );
   const navigate = useNavigate();
+
+  const loadData = async () => {
+    try {
+      // @ts-ignore
+
+      const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+
+      const response = await axios.get(getJsonApiUrl + userId);
+      // if(response.status===201){
+
+      // }
+      return JSON.parse(response.data.JSONString);
+      // return Template1
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
+
+  useEffect(()=>{
+    const data = loadData()
+    
+  },[])
   // const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
 
   const [formData, setFormData] = useState({
@@ -229,18 +255,20 @@ export default function CompanyDetails() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    borderRadius:"15px"
+    borderRadius:"15px",
+    border:"none"
    
   };
 
   return (
-    <>
-      <Button onClick={() => { setModalOpen(true) }}>Submit</Button>
-      <Modal open={modalOpen} onClose={(data) => {  
-        setModalOpen(false);
-        clearForm();
-        
-      }}>
+    <div className="w-screen h-screen">
+      {/* <Button onClick={() => { setModalOpen(true) }}>Submit</Button> */}
+      <img src={backImg} alt="" className="w-full outline-none xl:max-w-[90%] mx-auto h-full" />
+      <Modal open={modalOpen} onClose={
+        ()=>{
+
+        }       
+      }>
         <Box sx={style} className={"bg-white rounded-lg !mx-auto  w-full !max-w-7xl h-[80vh]  p-12"}>
           <Stepper steps={[{}, {}, {}]} initialStep={0} variant={"line"}>
             
@@ -391,6 +419,6 @@ export default function CompanyDetails() {
           </Stepper>
         </Box>
       </Modal>
-    </>
+    </div>
   );
 }
