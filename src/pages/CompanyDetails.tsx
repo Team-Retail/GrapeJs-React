@@ -7,8 +7,14 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {  BASE_URL } from "../utils/base";
 import { User } from "../utils/types";
+import { Step, Stepper } from "../components/shadcn/stepper";
+import StepperNext from "./../components/StepperNext.tsx";
+import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 
 export default function CompanyDetails() {
+  const [modalOpen, setModalOpen] = useState(false);
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
   const [businessCardFront, setBusinessCardFront] = useState<FileList | null>(
     null,
@@ -219,158 +225,157 @@ export default function CompanyDetails() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center m-4 justify-center">
-      <h1 className="font-bold text-2xl m-6">
-        Enter Details about your company
-      </h1>
-      <form
-        className="flex flex-col gap-4 w-full max-w-[600px] my-6"
-        onSubmit={(e: FormEvent) => {
-          e.preventDefault();
-          submitForm();
-        }}
-      >
-     
-        <div className="border flex flex-col p-6 w-full rounded-[14px]">
-          <label className="text-lg">
-            1. Please enter your Company website link
-          </label>
-          <input
-            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
-            type="text"
-            placeholder="Enter website link"
-            value={formData.company_website}
-            onChange={(e) =>
-              setFormData({ ...formData, company_website: e.target.value })
-            }
-          />
-        </div>
-        <div className="border flex flex-col p-6 rounded-[14px]">
-          <p className="text-lg mb-3">2. Upload Company Logo</p>
-          <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload
-              type="image/*;capture=camera"
-              color="#1A72D3"
-            />
-            Add file
-            <input
-              className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
-              type="file"
-              style={{ display: "none" }}
-              onChange={(e) => setCompanyLogo(e.target.files)}
-            />
-          </label>
-          <div>{companyLogo && <p>{companyLogo[0]?.name}</p>}</div>
-        </div>
-        <div className="border flex flex-col p-6 rounded-[14px]">
-          <p className="text-lg mb-3">3. Upload Front of your business card.</p>
-          <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload
-              color="#1A72D3"
-              type="image/*;capture=camera"
-            />
-            Add file
-            <input
-              className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
-              type="file"
-              style={{ display: "none" }}
-              onChange={(e) => setBusinessCardFront(e.target.files)}
-            />
-          </label>
-          <div>{businessCardFront && <p>{businessCardFront[0]?.name}</p>}</div>
-        </div>
-        <div className="border flex flex-col p-6 rounded-[14px]">
-          <p className="text-lg mb-3">
-            4. Upload Backside of your business card.
-          </p>
-          <label className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-            <MdOutlineFileUpload
-              color="#1A72D3"
-              type="image/*;capture=camera"
-            />
-            Add file
-            <input
-              className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
-              type="file"
-              style={{ display: "none" }}
-              onChange={(e) => setBusinessCardBack(e.target.files)}
-            />
-          </label>
-          <div>{businessCardBack && <p>{businessCardBack[0]?.name}</p>}</div>
-        </div>
-        <div className="border flex flex-col p-6 w-full rounded-[14px]">
-          <label className="text-lg">
-            5. Enter social media links, [Instagram]
-          </label>
-          <input
-            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
-            type="text"
-            placeholder="Your answer"
-            value={formData.company_instagram}
-            onChange={(e) =>
-              setFormData({ ...formData, company_instagram: e.target.value })
-            }
-          />
-        </div>
-        <div className="border flex flex-col p-6 w-full rounded-[14px]">
-          <label className="text-lg">
-            6. Enter social media links, [Twitter]
-          </label>
-          <input
-            className="border-b-[1.5px] w-full mt-2 outline-none text-[#6B6B6B]"
-            type="text"
-            placeholder="Your answer"
-            value={formData.company_twitter}
-            onChange={(e) =>
-              setFormData({ ...formData, company_twitter: e.target.value })
-            }
-          />
-        </div>
-        <div className="border flex flex-col p-6 w-full rounded-[14px]">
-          <label className="text-lg">
-            7. Enter the Location of your company
-          </label>
-          <div className="flex w-full justify-between gap-3">
-            <input
-              className="w-full border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
-              type="text"
-              placeholder="Your answer"
-              value={formData.company_address}
-              
-              onChange={handleAddressChange}
-            />
-            {suggestions.length > 0 && (
-              <ul className="absolute z-10 bg-white border border-gray-300 text-black rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
-                {suggestions.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    className="p-2 cursor-pointer hover:bg-gray-200"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {/* @ts-ignore */}
-                    {suggestion?.Place?.Label}
-                  </li>
-                ))}
-              </ul>
-            )}
-           
-          </div>
-        </div>
-        <div className="mt-4 flex flex-row justify-between">
-          <button
-            onClick={clearForm}
-            className="border border-[#6B6B6B] rounded-[14px] px-8 py-2"
-          >
-            Clear
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white font-semibold rounded-[14px] px-8 py-2"
-          >
-            {isLoading ? "Saving..." : "Save & Continue"}
-          </button>
-        </div>
-      </form>
-    </div>
+    <>
+      <Button onClick={() => { setModalOpen(true) }}>Submit</Button>
+      <Modal open={modalOpen} onClose={(data) => {
+        setModalOpen(false);
+        clearForm();
+      }}>
+        <Box className={"bg-white mx-auto max-w-7xl my-48 p-12"}>
+          <Stepper steps={[{}, {}, {}]} initialStep={0} variant={"line"}>
+            <Step label={"Enter company details"}>
+              <div>
+                <div className="flex flex-col p-6 w-full rounded-[14px]">
+                  <label className="text-lg">
+                    1. Please enter your Company website link
+                  </label>
+                  <input
+                    className="border-[1.5px] px-4 py-2 rounded-xl w-full mt-2 outline-none text-[#6B6B6B]"
+                    type="text"
+                    placeholder="Enter website link"
+                    value={formData.company_website}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company_website: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="flex flex-col p-6 rounded-[14px]">
+                  <p className="text-lg mb-3">2. Upload Company Logo</p>
+                  <label
+                    className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+                    <MdOutlineFileUpload
+                      type="image/*;capture=camera"
+                      color="#1A72D3"
+                    />
+                    Front side
+                    <input
+                      className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(e) => setCompanyLogo(e.target.files)}
+                    />
+                  </label>
+                  <div>{companyLogo && <p>{companyLogo[0]?.name}</p>}</div>
+                </div>
+                <div className="flex flex-col p-6 rounded-[14px]">
+                  <p className="text-lg mb-3">3. Upload Front & back of your business card.</p>
+                  <div className={"flex gap-x-3"}>
+                    <label
+                      className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+                      <MdOutlineFileUpload
+                        color="#1A72D3"
+                        type="image/*;capture=camera"
+                      />
+                      Front side
+                      <input
+                        className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(e) => setBusinessCardFront(e.target.files)}
+                      />
+                    </label>
+                    <label
+                      className="w-[fit-content] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
+                      <MdOutlineFileUpload
+                        color="#1A72D3"
+                        type="image/*;capture=camera"
+                      />
+                      Back side
+                      <input
+                        className="border-b-2 mt-2 outline-none text-[#6B6B6B]"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(e) => setBusinessCardBack(e.target.files)}
+                      />
+                    </label>
+                  </div>
+                  <div>{businessCardFront && <p>{businessCardFront[0]?.name}</p>}</div>
+                  <div>{businessCardBack && <p>{businessCardBack[0]?.name}</p>}</div>
+                </div>
+              </div>
+              <div className={"flex items-center justify-center"}>
+                <StepperNext>
+                  <Button variant={"contained"}>Save & Next</Button>
+                </StepperNext>
+              </div>
+            </Step>
+            <Step label={"Enter other details"}>
+              <div className="flex flex-col p-6 w-full rounded-[14px]">
+                <label className="text-lg">
+                  5. Enter social media links, [Instagram]
+                </label>
+                <input
+                  className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                  type="text"
+                  placeholder="Enter link"
+                  value={formData.company_instagram}
+                  onChange={(e) =>
+                    setFormData({ ...formData, company_instagram: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col p-6 w-full rounded-[14px]">
+                <label className="text-lg">
+                  6. Enter social media links, [Twitter]
+                </label>
+                <input
+                  className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                  type="text"
+                  placeholder="Enter link"
+                  value={formData.company_twitter}
+                  onChange={(e) =>
+                    setFormData({ ...formData, company_twitter: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col p-6 w-full rounded-[14px]">
+                <label className="text-lg">
+                  7. Enter the Location of your company
+                </label>
+                <div className="flex w-full justify-between gap-3">
+                  <input
+                    className="border-[1.5px] px-4 py-2 w-full mt-2 outline-none text-[#6B6B6B]"
+                    type="text"
+                    placeholder="Enter location"
+                    value={formData.company_address}
+
+                    onChange={handleAddressChange}
+                  />
+                  {suggestions.length > 0 && (
+                    <ul
+                      className="absolute z-10 bg-white border border-gray-300 text-black rounded-md mt-12 w-[80%] max-h-60 overflow-y-auto">
+                      {suggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="p-2 cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          {/* @ts-ignore */}
+                          {suggestion?.Place?.Label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+              <StepperNext>
+                <Button variant={"contained"}>Save & Next</Button>
+              </StepperNext>
+            </Step>
+            <Step label={"Choose template"}></Step>
+          </Stepper>
+        </Box>
+      </Modal>
+    </>
   );
 }

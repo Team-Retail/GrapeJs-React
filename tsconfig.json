@@ -21,7 +21,6 @@
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmitOnError": false
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
