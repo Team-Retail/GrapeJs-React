@@ -59,16 +59,16 @@ export default function RightSidebar({
       <div
         className={cx("overflow-y-auto flex-grow border-t", MAIN_BORDER_COLOR)}
       >
-        {selectedTab === 0 && (
-          <>
-            <SelectorsProvider>
-              {(props) => <CustomSelectorManager {...props} />}
-            </SelectorsProvider>
-            <StylesProvider>
-              {(props) => <CustomStyleManager {...props} />}
-            </StylesProvider>
-          </>
-        )}
+        {/* {selectedTab === 0 && (
+        )} */}
+        <>
+          <SelectorsProvider>
+            {(props) => <CustomSelectorManager {...props} />}
+          </SelectorsProvider>
+          <StylesProvider>
+            {(props) => <CustomStyleManager {...props} />}
+          </StylesProvider>
+        </>
         {selectedTab === 1 && (
           <TraitsProvider>
             {(props) => <CustomTraitManager {...props} />}

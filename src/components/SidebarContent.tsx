@@ -18,7 +18,8 @@ function SidebarContent({ activeTab }: { activeTab: string | null }) {
 
   return (
     <div className="bg-slate-50 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] flex flex-col text-[#053663] fixed top-[16vh] right-8 h-[80%] w-[300px] mt-4  rounded-xl p-4 overflow-y-auto flex-grow">
-      {activeTab === ("core:brush" || null) && (
+      {/* {activeTab === ("core:brush" || null) && (
+       )}  */}
       <>
         {/* <SelectorsProvider>
           {(props) => <CustomSelectorManager {...props} />}
@@ -27,7 +28,6 @@ function SidebarContent({ activeTab }: { activeTab: string | null }) {
           {(props) => <CustomStyleManager {...props} />}
         </StylesProvider>
       </>
-       )} 
       {activeTab === "core:settings" && (
         <TraitsProvider>
           {(props) => <CustomTraitManager {...props} />}

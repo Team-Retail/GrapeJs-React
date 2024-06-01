@@ -11,7 +11,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<AuthPage />} />
       <Route path="/editor" element={<GrapeJSPage />} />
-      <Route path="/select" element={<Select />} />
       <Route path="/company" element={<CompanyDetails />} />
       <Route path="/verify/:token" element={<EmailVerification />} />
     </Routes>

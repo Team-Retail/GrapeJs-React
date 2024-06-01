@@ -29,6 +29,8 @@ export default function AuthPage() {
     }));
   };
 
+  
+
   const URL = BASE_URL + "/api/auth";
 
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -52,6 +54,7 @@ export default function AuthPage() {
           firstName: user.firstName,
           lastName: user.lastName,
           companyName: user.companyName,
+          hasSocial: user.hasSocial,
 
         }));
         setSnackbarMessage("User logedIn.");
@@ -145,7 +148,7 @@ export default function AuthPage() {
 
 
         <div className="flex flex-col ">
-          <h1 className="text-4xl text-white font-mono font-thin leading-none">{!signIn ? "New User?" : "Aleady a user?"}</h1>
+          <h1 className="text-4xl text-white font-mono font-thin leading-none">{!signIn ? "New User?" : "Already a user?"}</h1>
           <p className="text-white text-sm">
             {!signIn ? "Sign Up & start Customising!" : "Sign in & start Customising!"}
           </p>

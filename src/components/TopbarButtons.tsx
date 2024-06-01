@@ -240,7 +240,7 @@ export default function TopbarButtons({
       >
         <Box sx={style} className="w-full flex flex-col gap-6 !pt-8 rounded-lg">
           <h1 className="text-black text-4xl font-semibold text-center">Scan Qr</h1>
-          <QRCode value={url} className="!w-60  !h-60 mx-auto" />
+          <QRCode value={coded} className="!w-60  !h-60 mx-auto" />
           <p className="text-center tracking-widest p-2 text-black text-4xl font-mono rounded-lg w-fit mx-auto font-bold">
             {coded}
           </p>

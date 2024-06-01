@@ -16,6 +16,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Template1, Template2 } from "../utils/template.ts";
 import { BASE_URL } from "../utils/base.ts";
+import { useNavigate } from "react-router-dom";
 // import 'slick-carousel/slick/slick.min.js';
 
 const theme = createTheme({
@@ -23,6 +24,8 @@ const theme = createTheme({
     mode: "light",
   },
 });
+
+
 
 
 const saveJsonApiUrl = BASE_URL + "/api/auth/save-json";
@@ -258,6 +261,24 @@ const editorPlugins = (editor) => {
 export default function GrapeJSPage() {
   const [activeTab, setActiveTab] = React.useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = React.useState<string>('Template1');
+  const navigate = useNavigate()
+  React.useEffect(() => {
+    userFunc()
+
+  }, [])
+
+  const userFunc = () => {
+    const user = JSON.parse(localStorage.getItem("userDetails"))
+    console.log("user",user)
+    if (!user) {
+      navigate("/")
+    }
+    // @ts-ignore
+    if (!user?.hasSocial) {
+      navigate("/company")
+
+    }
+  }
 
   const onEditor = async (editor) => {
     console.log("Editor loaded");

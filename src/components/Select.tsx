@@ -8,8 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL,  } from "../utils/base";
 const saveJsonApiUrl =BASE_URL + "/api/auth/save-json";
 
+type SelectProps ={
+  submitForm:()=>Promise<void>
+}
 
-const Select: React.FC = () => {
+const Select: React.FC<SelectProps> = ({submitForm}) => {
   const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
   const navigate = useNavigate()
 
@@ -24,13 +27,19 @@ const Select: React.FC = () => {
     }
     // @ts-ignore
 
+    await submitForm()
+
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
     const response = await axios.post(saveJsonApiUrl, {
       userId,
       JSONString: JSON.stringify(selectedFrame === "frame1" ? Template1 : Template2),
     });
     if (response.status === 201) {
-      navigate("/editor")
+      console.log("inside navigate")
+      setTimeout(() => {
+        
+        navigate("/editor")
+      }, 10);
     }
 
   }

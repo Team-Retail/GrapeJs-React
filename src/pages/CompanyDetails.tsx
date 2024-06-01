@@ -48,9 +48,24 @@ export default function CompanyDetails() {
 
   useEffect(()=>{
     const data = loadData()
-    
+    userFunc()
   },[])
-  // const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
+
+  
+
+  const userFunc = () => {
+    const user = JSON.parse(localStorage.getItem("userDetails"))
+    console.log("user", user)
+    if (!user) {
+      navigate("/")
+    }
+    // @ts-ignore
+    if (user?.hasSocial) {
+      navigate("/editor")
+
+    }
+  }
+ 
 
   const [formData, setFormData] = useState({
     company_website: "",
@@ -72,8 +87,10 @@ export default function CompanyDetails() {
   const ref = useRef(Date.now());
 
   useTimeout(() => {
+
     setModalOpen(true);
   }, 1000);
+ 
 
   const s3Client = new S3Client({
     region: import.meta.env.VITE_APP_AWS_REGION,
@@ -228,8 +245,16 @@ export default function CompanyDetails() {
         companyData,
       );
       console.log("Company Detail Submit response", res.data);
-      clearForm();
-      navigate("/select");
+
+      localStorage.setItem("userDetails", JSON.stringify({
+        ...user,
+        hasSocial:true
+
+      }));
+      
+      // clearForm();
+
+      // navigate("/select");
     } catch (error) {
       console.error("Error saving company data:", error);
     }
@@ -426,7 +451,7 @@ export default function CompanyDetails() {
               </div>
             </Step>
             <Step label={"Choose template"}>
-              <Select />
+              <Select submitForm={submitForm}/>
             </Step>
           </Stepper>
         </Box>
