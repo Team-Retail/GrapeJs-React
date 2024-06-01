@@ -134,12 +134,12 @@ export default function AuthPage() {
 
   return (
     <main className="w-full h-full min-h-screen flex items-center">
-      <div className=" w-3/5 h-screen bg-blue-500 p-10 pb-28 clipPath flex flex-col justify-between" >
+      <div className=" w-3/5 h-screen bg-blue-500 p-10 pb-28 clipPath flex flex-col justify-between !font-manrope" >
 
         <img src={whitelogo} alt="logo" className="w-14 h-14" />
         <div className="flex flex-col ">
-          <h1 className="text-white font-mono text-6xl tracking-tight ">Welcome {signIn ? "Back" : "New User"} !</h1>
-          <h1 className="text-white text-opacity-60 text-xl font-light font-mono"> {signIn ? "We are happy to have you again." : "We are happy to have you, Signup & Join us"}</h1>
+          <h1 className="text-white font-mono font-semibold text-6xl tracking-tight ">Welcome {signIn ? "Back" : "New User"}!</h1>
+          <h1 className="text-white  text-opacity-60 text-xl  font-mono"> {signIn ? "We are happy to have you again." : "We are happy to have you, Signup & Join us"}</h1>
         </div>
 
 
