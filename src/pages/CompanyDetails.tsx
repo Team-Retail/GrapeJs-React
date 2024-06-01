@@ -12,6 +12,7 @@ import StepperNext from "./../components/StepperNext.tsx";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import Select from "../components/Select.tsx";
 
 export default function CompanyDetails() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -223,16 +224,26 @@ export default function CompanyDetails() {
     setBusinessCardBack(null);
     // setCompanyLocation(null);
   };
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    
+   
+  };
 
   return (
     <>
       <Button onClick={() => { setModalOpen(true) }}>Submit</Button>
-      <Modal open={modalOpen} onClose={(data) => {
+      <Modal open={modalOpen} onClose={(data) => {  
         setModalOpen(false);
         clearForm();
+        
       }}>
-        <Box className={"bg-white mx-auto max-w-7xl my-48 p-12"}>
+        <Box sx={style} className={"bg-white !mx-auto  w-full !max-w-7xl h-[80vh]  p-12"}>
           <Stepper steps={[{}, {}, {}]} initialStep={0} variant={"line"}>
+            
             <Step label={"Enter company details"}>
               <div>
                 <div className="flex flex-col p-6 w-full rounded-[14px]">
@@ -372,7 +383,11 @@ export default function CompanyDetails() {
                 <Button variant={"contained"}>Save & Next</Button>
               </StepperNext>
             </Step>
-            <Step label={"Choose template"}></Step>
+            <Step label={"Choose template"}>
+              <Select />
+
+            </Step>
+            
           </Stepper>
         </Box>
       </Modal>

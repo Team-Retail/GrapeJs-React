@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import GrapeJSPage from "./pages/GrapeJSPage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
-import Select from "./pages/Select.tsx";
+import Select from "./components/Select.tsx";
 import CompanyDetails from "./pages/CompanyDetails.tsx";
 import EmailVerification from "./pages/EmailVerification.tsx";
 
