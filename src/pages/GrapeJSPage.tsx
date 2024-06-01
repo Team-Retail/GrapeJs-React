@@ -15,6 +15,7 @@ import { MAIN_BORDER_COLOR } from "../components/common.ts";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Template1, Template2 } from "../utils/template.ts";
+import { BASE_URL } from "../utils/base.ts";
 // import 'slick-carousel/slick/slick.min.js';
 
 const theme = createTheme({

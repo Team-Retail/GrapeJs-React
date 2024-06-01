@@ -13,14 +13,10 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Select from "../components/Select.tsx";
-<<<<<<< HEAD
 import backImg from "../assets/backImg.png"
-import { BASE_URL } from "../utils/base.ts";
 
 const getJsonApiUrl = BASE_URL + "/api/auth/get-json/";
-=======
 import useTimeout from "../utils/useTimeout.ts";
->>>>>>> b6fccd750e3227eb8242e41ea8dbb98826f9c2e0
 
 export default function CompanyDetails() {
   const [modalOpen, setModalOpen] = useState(true);
