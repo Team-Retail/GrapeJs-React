@@ -2,37 +2,28 @@ import { useEditor } from "@grapesjs/react";
 import {
   mdiArrowULeftTop,
   mdiArrowURightTop,
-  mdiFullscreen,
-  mdiLoading,
-  mdiUpload,
   mdiBrush,
-  mdiLayers,
-  mdiViewGridPlus,
-  mdiTextBoxMultiple,
   mdiCog,
+  mdiFullscreen,
   mdiImage,
+  mdiLayers,
+  mdiLoading,
+  mdiTextBoxMultiple,
+  mdiUpload,
+  mdiViewGridPlus,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import Box from "@mui/material/Box";
-import CryptoJS from "crypto-js";
+import Modal from "@mui/material/Modal";
+import axios from "axios";
+import QRCode from "qrcode.react";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { BTN_CLS, MAIN_BORDER_COLOR, cx } from "./common.ts";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import Modal from "@mui/material/Modal";
-import QRCode from "qrcode.react";
-import axios from "axios";
-import { getBaseUrl } from "../utils/base.ts";
+import { BASE_URL } from "../utils/base.ts";
+import { cx } from "./common.ts";
+import { User } from "../utils/types.ts";
 
-// @ts-ignore
-const generateRandomAlphanumeric = (length) => {
-  const characters = "0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-};
+
 
 interface TopbarButtonsProps extends React.HTMLAttributes<HTMLDivElement> {
   setSidebarState: (state: string) => void;
@@ -55,7 +46,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-// @ts-ignore
+
 
 export default function TopbarButtons({
   className,
@@ -66,15 +57,9 @@ export default function TopbarButtons({
   const [open, setOpen] = useState(false);
   const { UndoManager, Commands } = editor;
   const [isLoading, setisLoading] = useState(false);
-  const ref = React.useRef<string>();
   const [coded, setCoded] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
-
-  useEffect(() => {
-    const newHash = CryptoJS.MD5(new Date() + "").toString();
-    ref.current = newHash;
-  }, []);
 
   useEffect(() => {
     const cmdEvent = "run stop";
@@ -83,14 +68,9 @@ export default function TopbarButtons({
       cmdButtons.find((btn) => btn.id === id);
     };
     editor.on(cmdEvent, onCommand);
-    // editor.on(updateEvent);
-
-    // editor.select("Mobile portrait")
-    // editor.select
-
+  
     return () => {
       editor.off(cmdEvent, onCommand);
-      // editor.off(updateEvent);
     };
   }, []);
 
@@ -98,7 +78,6 @@ export default function TopbarButtons({
     const htmlContent = editor.getHtml();
     const cssContent = editor.getCss();
     setisLoading(true);
-    const usernameFolder = localStorage.getItem("COMPANY_USERNAME");
 
     try {
       const completeHtml = `
@@ -116,52 +95,28 @@ export default function TopbarButtons({
       </html>
     `;
 
-      console.log(completeHtml);
 
-      // Configure AWS SDK
-      const s3Client = new S3Client({
-        region: import.meta.env.VITE_APP_AWS_REGION,
-        credentials: {
-          accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_ID,
-          secretAccessKey: import.meta.env.VITE_APP_AWS_SECRET_ACCESS_KEY,
-        },
-      });
 
-      const bucketName = import.meta.env.VITE_APP_AWS_BUCKET_NAME;
-      console.log(ref.current);
-      const htmlFilename = `${usernameFolder || "common"}/template-${ref.current}.html`;
+      const blob = new Blob([completeHtml], { type: 'text/html' });
+      const user:User = JSON.parse(localStorage.getItem('userDetails') )
+      const usernameFolder = user.companyName+"_"+user.email
 
-      // Upload the HTML file
-      const resp = await s3Client.send(
-        new PutObjectCommand({
-          Bucket: bucketName,
-          Key: htmlFilename,
-          Body: completeHtml,
-          ContentType: "text/html",
-        }),
-      );
 
-      console.log(resp);
+      const formData = new FormData();
+      formData.append('file', blob, `template-{${user._id}}.html`); 
+      formData.append('fieldName', usernameFolder); 
+      formData.append('userId', user._id);
+      
+     
+      const ress = await axios.post(BASE_URL + "/api/auth/uploadHtml",formData);
+      console.log(ress)
+      if(ress.status===200){
+        setCoded(ress.data.code)
+        setUrl(ress.data.url)
+        setOpen(true);
+      }
 
-      const url = `https://${bucketName}.s3.${import.meta.env.VITE_APP_AWS_REGION}.amazonaws.com/${htmlFilename}`;
-
-      const code = generateRandomAlphanumeric(6);
-      console.log(code);
-      // @ts-ignore
-
-      const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
-
-      // Send the data to the remote server
-      const ress = await axios.post(getBaseUrl() + "/api/auth/content", {
-        URL: url,
-        userId,
-        code: code.toString(),
-      });
-
-      // Set the URL in the state variable
-      setCoded(code);
-      setUrl(url);
-      setOpen(true);
+   
     } catch (error) {
       console.error("Error uploading file:", error);
       alert("Failed to upload file.");
@@ -284,8 +239,9 @@ export default function TopbarButtons({
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} className="w-full flex flex-col gap-6 !pt-8 rounded-lg">
+          <h1 className="text-black text-4xl font-semibold text-center">Scan Qr</h1>
           <QRCode value={url} className="!w-60  !h-60 mx-auto" />
-          <p className="text-center tracking-widest p-2 bg-black text-white rounded-lg w-fit mx-auto font-bold">
+          <p className="text-center tracking-widest p-2 text-black text-4xl font-mono rounded-lg w-fit mx-auto font-bold">
             {coded}
           </p>
           <a

@@ -6,6 +6,7 @@ import { SearchPlaceIndexForTextCommand } from "@aws-sdk/client-location";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {  BASE_URL } from "../utils/base";
+import { User } from "../utils/types";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -69,7 +70,8 @@ export default function CompanyDetails() {
 
   const handleFileUpload = async () => {
     setIsLoading(true);
-    const usernameFolder = localStorage.getItem("COMPANY_USERNAME");
+    const user: User = JSON.parse(localStorage.getItem('userDetails'))
+    const usernameFolder = user.companyName + "_" + user.email
 
     const uploadPromises = [];
 
@@ -228,18 +230,7 @@ export default function CompanyDetails() {
           submitForm();
         }}
       >
-        {/* <div className="border flex flex-col p-6 w-full rounded-[14px]">
-          <label className="text-lg">1. Please enter your Company Name</label>
-          <input
-            className="border-b-2 w-full mt-2 outline-none text-[#6B6B6B]"
-            type="text"
-            placeholder="Company Name"
-            value={formData.company_name}
-            onChange={(e) =>
-              setFormData({ ...formData, company_name: e.target.value })
-            }
-          />
-        </div> */}
+     
         <div className="border flex flex-col p-6 w-full rounded-[14px]">
           <label className="text-lg">
             1. Please enter your Company website link
@@ -341,14 +332,11 @@ export default function CompanyDetails() {
           </label>
           <div className="flex w-full justify-between gap-3">
             <input
-              // id="company_address"
               className="w-full border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
               type="text"
               placeholder="Your answer"
               value={formData.company_address}
-              // onChange={(e) =>
-              //   setFormData({ ...formData, company_address: e.target.value })
-              // }
+              
               onChange={handleAddressChange}
             />
             {suggestions.length > 0 && (
@@ -365,19 +353,7 @@ export default function CompanyDetails() {
                 ))}
               </ul>
             )}
-            {/* <label className="w-[20%] flex items-center gap-2 py-2 px-4 border border-[#1A72D3] text-[#1A72D3] rounded text-sm font-semibold">
-              <MdOutlineFileUpload
-                color="#1A72D3"
-                type="image/*;capture=camera"
-              />
-              Add file
-              <input
-                className="border-b-[1.5px] mt-2 outline-none text-[#6B6B6B]"
-                type="file"
-                style={{ display: "none" }}
-                onChange={(e) => setCompanyLocation(e.target.files)}
-              />
-            </label> */}
+           
           </div>
         </div>
         <div className="mt-4 flex flex-row justify-between">

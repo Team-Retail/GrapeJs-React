@@ -49,11 +49,8 @@ export default function StylePropertyField({
 
   const onChange = (ev: any) => {
     const inputValue = ev.target.value;
-    console.log("val", inputValue) // Remove non-numeric characters
     prop.upValue(inputValue);
-    // const parsedValue = parseFloat(inputValue);
-    // const val = Number.isInteger(parsedValue) ? `${parsedValue}${unit}` : `${parsedValue}${unit}`;
-    // console.log(inputValue, val);
+
     setValue(inputValue);
   };
 
@@ -67,7 +64,6 @@ export default function StylePropertyField({
     const { Assets } = editor;
     Assets.open({
       select: (asset, complete) => {
-        console.log({ complete });
         prop.upValue(asset.getSrc(), { partial: !complete });
         complete && Assets.close();
       },
@@ -83,7 +79,6 @@ export default function StylePropertyField({
   const valueString = hasValue ? value : "";
   const valueWithDef = hasValue ? value : defValue;
 
-  console.log(prop)
 
   let inputToRender = (
     <TextField

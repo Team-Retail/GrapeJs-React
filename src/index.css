@@ -24,4 +24,8 @@
     display: none; /* Chrome, Safari, and Opera */
   }
 
+  .clipPath{
+    clip-path: circle(100% at 0 100px);
+  }
+
 }

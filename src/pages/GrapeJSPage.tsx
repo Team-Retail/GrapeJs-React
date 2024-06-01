@@ -314,7 +314,7 @@ export default function GrapeJSPage() {
           onTemplateChange={handleTemplateChange}
         />
         <div className={`flex h-full border-t ${MAIN_BORDER_COLOR}`}>
-          <div className="gjs-column-m flex flex-col mt-[18vh] mr-[30vw] ml-8 w-full">
+          <div className="gjs-column-m flex flex-col mt-[18vh] mr-[400px] ml-8 w-full">
             <Canvas className="gjs-custom-editor-canvas w-full scrollbar-none shadow-[0_3px_10px_rgb(0,0,0,0.2)]" />
           </div>
           <SidebarContent activeTab={activeTab} />
