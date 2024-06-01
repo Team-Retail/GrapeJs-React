@@ -586,10 +586,14 @@ const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
         data-active={active}
         data-clickable={clickable || !!onClickStep}
         data-invalid={localIsError}
-        onClick={() =>
-          onClickStep?.(index || 0, setStep) ||
-          onClickStepGeneral?.(index || 0, setStep)
-        }
+        onClick={() => {
+          const stepIndex = index;
+          if (onClickStep) {
+            onClickStep(stepIndex, setStep);
+          } else if (onClickStepGeneral) {
+            onClickStepGeneral(stepIndex, setStep);
+          }
+        }}
       >
         <div
           data-vertical={true}

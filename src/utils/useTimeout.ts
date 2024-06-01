@@ -13,6 +13,7 @@ function useTimeout(callback, delay) {
     }
 
     const id = setTimeout(() => {
+      // @ts-ignore
       savedCallback.current();
     }, delay);
 
