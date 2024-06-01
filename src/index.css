@@ -13,3 +13,15 @@
 .MuiInputBase-root{
   padding-right:0!important;
 }
+
+@layer components{
+  iframe {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  iframe::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
+
+}

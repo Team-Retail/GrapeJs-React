@@ -48,11 +48,12 @@ export default function StylePropertyField({
   };
 
   const onChange = (ev: any) => {
-    const inputValue = ev.target.value; // Remove non-numeric characters
+    const inputValue = ev.target.value;
+    console.log("val", inputValue) // Remove non-numeric characters
+    prop.upValue(inputValue);
     // const parsedValue = parseFloat(inputValue);
     // const val = Number.isInteger(parsedValue) ? `${parsedValue}${unit}` : `${parsedValue}${unit}`;
     // console.log(inputValue, val);
-    // prop.upValue(val);
     setValue(inputValue);
   };
 
@@ -81,6 +82,8 @@ export default function StylePropertyField({
   const hasValue = prop.hasValue();
   const valueString = hasValue ? value : "";
   const valueWithDef = hasValue ? value : defValue;
+
+  console.log(prop)
 
   let inputToRender = (
     <TextField

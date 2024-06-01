@@ -5,7 +5,7 @@ import { LocationClient } from "@aws-sdk/client-location";
 import { SearchPlaceIndexForTextCommand } from "@aws-sdk/client-location";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getBaseUrl } from "../utils/base";
+import {  BASE_URL } from "../utils/base";
 
 export default function CompanyDetails() {
   const [companyLogo, setCompanyLogo] = useState<FileList | null>(null);
@@ -19,42 +19,25 @@ export default function CompanyDetails() {
   // const [companyLocation, setCompanyLocation] = useState<FileList | null>(null);
 
   const [formData, setFormData] = useState({
-    // company_name: "",
     company_website: "",
     company_instagram: "",
     company_twitter: "",
     company_address: "",
-    // companyLogoUrl: "",
-    // businessCardFrontUrl: "",
-    // businessCardBackUrl: "",
-    // companyLocationUrl: "",
+  
   });
 
-  // const [query, setQuery] = useState("");
-  // const [loading, setLoading] = useState(false);
 
   const [suggestions, setSuggestions] = useState([]);
   const [companyAddress, setCompanyAddress] = useState("");
-  // const [companyLogoUrl, setCompanyLogoUrl] = useState("");
-  // const [businessCardFrontUrl, setBusinessCardFrontUrl] = useState("");
-  // const [businessCardBackUrl, setBusinessCardBackUrl] = useState("");
+ 
   const companyLogoUrlRef = useRef("");
   const businessCardFrontUrlRef = useRef("");
   const businessCardBackUrlRef = useRef("");
-  const BASE_URL = getBaseUrl() + "/api/auth";
+  const URL = BASE_URL + "/api/auth";
   const [isLoading, setIsLoading] = useState(false);
   const ref = useRef(Date.now());
 
-  // const REGION = "YOUR_REGION"; // e.g., us-west-2
-  // const IDENTITY_POOL_ID = "YOUR_IDENTITY_POOL_ID";
 
-  // const client = new LocationClient({
-  //   region: REGION,
-  //   credentials: fromCognitoIdentityPool({
-  //     client: new CognitoIdentityClient({ region: REGION }),
-  //     identityPoolId: IDENTITY_POOL_ID,
-  //   }),
-  // });
 
   const s3Client = new S3Client({
     region: import.meta.env.VITE_APP_AWS_REGION,
@@ -204,7 +187,7 @@ export default function CompanyDetails() {
     console.log(companyData);
     try {
       const res = await axios.post(
-        BASE_URL + "/createSocialMedia",
+        URL + "/createSocialMedia",
         companyData,
       );
       console.log("Company Detail Submit response", res.data);

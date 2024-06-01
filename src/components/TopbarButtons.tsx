@@ -194,14 +194,14 @@ export default function TopbarButtons({
       options: { target: "#root" },
     },
     {
-      id: "core:redo",
-      iconPath: mdiArrowURightTop,
-      disabled: () => !UndoManager.hasRedo(),
-    },
-    {
       id: "core:undo",
       iconPath: mdiArrowULeftTop,
       disabled: () => !UndoManager.hasUndo(),
+    },
+    {
+      id: "core:redo",
+      iconPath: mdiArrowURightTop,
+      disabled: () => !UndoManager.hasRedo(),
     },
     {
       id: "core:image",

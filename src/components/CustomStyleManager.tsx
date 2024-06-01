@@ -13,12 +13,15 @@ const accordionIcon = <Icon path={mdiMenuDown} size={0.7} />;
 export default function CustomStyleManager({
   sectors,
 }: Omit<StylesResultProps, "Container">) {
+  const onlyTypo = React.useMemo(()=>{
+    return sectors.filter(sec => sec.id==="typography")
+  },[sectors])
   return (
     <div className="gjs-custom-style-manager text-left">
-      {sectors.map((sector) => (
+      {onlyTypo.map((sector) => (
         <Accordion key={sector.getId()} disableGutters>
           <AccordionSummary
-            className="!bg-slate-800"
+            className=""
             expandIcon={accordionIcon}
           >
             {sector.getName()}

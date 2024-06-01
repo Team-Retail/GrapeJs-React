@@ -1,9 +1,7 @@
 import axios from "axios";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { CiMail } from "react-icons/ci";
-import { CiLock } from "react-icons/ci";
-import { getBaseUrl } from "../utils/base";
+import { BASE_URL } from "../utils/base";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -14,7 +12,6 @@ export default function AuthPage() {
     company_name: "",
     email_id: "",
     password: "",
-    // company_location: "",
   });
   const [signIn, setSignIn] = useState(true);
 
@@ -25,7 +22,8 @@ export default function AuthPage() {
       [id]: value,
     }));
   };
-  const BASE_URL = getBaseUrl() + "/api/auth";
+
+  const URL = BASE_URL + "/api/auth";
 
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,7 +33,7 @@ export default function AuthPage() {
     };
 
     try {
-      const res = await axios.post(BASE_URL + "/login", signInData);
+      const res = await axios.post(URL + "/login", signInData);
       console.log("Sign In Response:", res.data);
       const user = res.data;
       localStorage.setItem("userDetails", JSON.stringify(user));
@@ -44,7 +42,7 @@ export default function AuthPage() {
         res.data.companyName + "_" + res.data.firstName + res.data.lastName,
       );
       resetForm();
-      navigate("/select");
+      // navigate("/select");
     } catch (error) {
       console.error("Sign In Error:", error);
     }
@@ -61,12 +59,11 @@ export default function AuthPage() {
       companyName: formData.company_name,
       email: formData.email_id,
       password: formData.password,
-      // companyLocation: formData.company_location,
       flag: true,
     };
 
     try {
-      const res = await axios.post(BASE_URL + "/signup", signUpData);
+      const res = await axios.post(URL + "/signup", signUpData);
       console.log("Sign Up Response:", res.data);
       const user = res.data;
       localStorage.setItem(
@@ -75,7 +72,7 @@ export default function AuthPage() {
       );
       localStorage.setItem("userDetails", JSON.stringify(user));
       resetForm();
-      navigate("/company");
+      // navigate("/company");
     } catch (error) {
       console.error("Sign Up Error:", error);
     }
@@ -88,7 +85,6 @@ export default function AuthPage() {
       company_name: "",
       email_id: "",
       password: "",
-      // company_location: "",
     });
   };
 
@@ -97,30 +93,31 @@ export default function AuthPage() {
     resetForm();
   };
 
-  // console.log(formData);
-
   return (
-    <main className="w-full items-center">
-      <div className="flex flex-row flex-1">
-        <div className="bg-[#F6F7FA] w-[50%] h-full">
-          <img
-            src="/groupedImage_login.png"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1 flex flex-col bg-white p-[6vw] w-[50%] h-full justify-center">
+    <main className="w-full h-full min-h-screen flex items-center">
+      <img
+        src="/groupedImage_login.png"
+        className="w-full h-screen object-cover"
+      />
+      <div className="p-14 flex flex-col bg-white w-full h-full justify-center">
+        <div className="max-w-[500px] rounded-xl border border-gray-300 p-10 shadow-lg mx-auto w-full flex flex-col items-center gap-4">
+          <img src="/CAI logo.png" className="w-10 h-10" />
           {signIn ? (
             <>
-              <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Welcome</h2>
-              <h6 className="text-lg text-[#6B6B6B] font-normal mb-6">
+              <h2 className="text-2xl font-bold">Welcome</h2>
+              <h6 className="text-md text-[#6B6B6B] font-semibold">
                 Enter Your Email ID to get one time password
               </h6>
-              <form onSubmit={handleSignInSubmit}>
-                <div className="flex flex-row items-center border border-[#6B6B6B] rounded p-2">
-                  <CiMail className="mr-2" size={20} color="#6B6B6B" />
+              <form onSubmit={handleSignInSubmit} className="w-full flex flex-col gap-4">
+                <div className="w-full">
+                  <label
+                    className="block text-gray-700 text-sm font-normal"
+                    htmlFor="email"
+                  >
+                    Email Address
+                  </label>
                   <input
-                    className="border-l-[1.5px] h-6 w-full px-2 text-[#6B6B6B] leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="email_id"
                     type="email"
                     placeholder="Enter Your Email"
@@ -128,10 +125,15 @@ export default function AuthPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="flex flex-row items-center border border-[#6B6B6B] rounded p-2 my-4">
-                  <CiLock className="mr-2" size={20} color="#6B6B6B" />
+                <div>
+                  <label
+                    className="block text-gray-700 text-sm font-normal"
+                    htmlFor="password"
+                  >
+                    Password
+                  </label>
                   <input
-                    className="border-l-[1.5px] h-6 w-full px-2 text-[#6B6B6B] leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="password"
                     type="password"
                     placeholder="Enter your password"
@@ -139,15 +141,7 @@ export default function AuthPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="flex text-xs items-center">
-                  <input type="checkbox" className="scale-75" />
-                  <p className="pl-2 text-[#6B6B6B]">
-                    I agree to the{" "}
-                    <span className="text-[#1A72D3]">terms and conditions</span>{" "}
-                    applied
-                  </p>
-                </div>
-                <div className="flex items-center justify-between mt-10">
+                <div className="flex items-center justify-between ">
                   <button
                     className="bg-[#1A72D3] hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                     type="submit"
@@ -156,10 +150,10 @@ export default function AuthPage() {
                   </button>
                 </div>
               </form>
-              <p className="text-xs text-[#6B6B6B] mt-4">
+              <p className="text-xs mt-5 text-[#6B6B6B] font-semibold">
                 Don't have an account?{" "}
                 <span
-                  className="text-[#1A72D3]  cursor-pointer"
+                  className="text-[#1A72D3] cursor-pointer"
                   onClick={toggleForm}
                 >
                   Sign Up
@@ -168,16 +162,15 @@ export default function AuthPage() {
             </>
           ) : (
             <>
-              <img src="/CAI logo.png" className="w-10 h-10 mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Create Account</h2>
-              <h6 className="text-lg text-zinc-600 font-normal mb-6">
+              <h2 className="text-2xl font-bold">Create Account</h2>
+              <h6 className="text-md text-[#6B6B6B] font-semibold">
                 Sign up to get started!
               </h6>
-              <form onSubmit={handleSignUpSubmit}>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+              <form onSubmit={handleSignUpSubmit} className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      className="block text-gray-700 text-sm font-normal mb-2"
+                      className="block text-gray-700 text-sm font-normal"
                       htmlFor="firstName"
                     >
                       First Name
@@ -193,7 +186,7 @@ export default function AuthPage() {
                   </div>
                   <div>
                     <label
-                      className="block text-gray-700 text-sm font-normal mb-2"
+                      className="block text-gray-700 text-sm font-normal"
                       htmlFor="lastName"
                     >
                       Last Name
@@ -208,9 +201,9 @@ export default function AuthPage() {
                     />
                   </div>
                 </div>
-                <div className="mb-4">
+                <div>
                   <label
-                    className="block text-gray-700 text-sm font-normal mb-2"
+                    className="block text-gray-700 text-sm font-normal"
                     htmlFor="companyName"
                   >
                     Company Name
@@ -224,25 +217,9 @@ export default function AuthPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                {/* <div className="mb-4">
+                <div>
                   <label
-                    className="block text-gray-700 text-sm font-normal mb-2"
-                    htmlFor="companyLocation"
-                  >
-                    Company Location
-                  </label>
-                  <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="company_location"
-                    type="text"
-                    placeholder="Enter your company location"
-                    value={formData.company_location}
-                    onChange={handleInputChange}
-                  />
-                </div> */}
-                <div className="mb-4">
-                  <label
-                    className="block text-gray-700 text-sm font-normal mb-2"
+                    className="block text-gray-700 text-sm font-normal"
                     htmlFor="email"
                   >
                     Email Address
@@ -256,9 +233,9 @@ export default function AuthPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-6">
+                <div>
                   <label
-                    className="block text-gray-700 text-sm font-normal mb-2"
+                    className="block text-gray-700 text-sm font-normal"
                     htmlFor="password"
                   >
                     Password
@@ -281,7 +258,7 @@ export default function AuthPage() {
                   </button>
                 </div>
               </form>
-              <p className="text-xs text-center text-gray-600 font-semibold mt-4">
+              <p className="text-xs mt-5 text-center text-[#6B6B6B] font-semibold">
                 Already have an account ?{" "}
                 <span
                   className="text-blue-500 cursor-pointer"

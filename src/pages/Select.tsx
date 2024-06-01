@@ -5,8 +5,8 @@ import frame3 from "../assets/frame3.png";
 import axios from "axios";
 import { Template1, Template2 } from "../utils/template";
 import { useNavigate } from "react-router-dom";
-import { getBaseUrl } from "../utils/base";
-const saveJsonApiUrl = getBaseUrl() + "/api/auth/save-json";
+import { BASE_URL,  } from "../utils/base";
+const saveJsonApiUrl =BASE_URL + "/api/auth/save-json";
 
 
 const Select: React.FC = () => {
