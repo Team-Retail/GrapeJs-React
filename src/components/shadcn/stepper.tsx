@@ -621,6 +621,7 @@ const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
           <StepLabel
             label={label}
             description={description}
+            indexNo={index}
             {...{ isCurrentStep, opacity }}
           />
         </div>
@@ -698,7 +699,7 @@ const HorizontalStep = React.forwardRef<HTMLDivElement, StepSharedProps>(
           variant === "circle" &&
           "[&:not(:last-child)]:after:flex-1 [&:not(:last-child)]:after:ms-[var(--step-gap)] [&:not(:last-child)]:after:me-[var(--step-gap)]",
           variant === "line" &&
-          "flex-col flex-1 border-t-[3px] data-[active=true]:border-primary",
+          "flex-col flex-1 border-b-[3px] data-[active=true]:border-primary",
           styles?.["horizontal-step"]
         )}
         data-optional={steps[index || 0]?.optional}
@@ -715,7 +716,7 @@ const HorizontalStep = React.forwardRef<HTMLDivElement, StepSharedProps>(
             "flex items-center",
             variant === "circle-alt" && "flex-col justify-center gap-1",
             variant === "line" && "w-full",
-            styles?.["horizontal-step-container"]
+            styles?.["horizontal-step-container"],
           )}
         >
           <StepButtonContainer
@@ -739,6 +740,7 @@ const HorizontalStep = React.forwardRef<HTMLDivElement, StepSharedProps>(
             label={label}
             description={description}
             {...{ isCurrentStep, opacity }}
+            indexNo={index}
           />
         </div>
       </div>
@@ -935,7 +937,8 @@ const StepIcon = React.forwardRef<HTMLDivElement, StepIconProps>(
 interface StepLabelProps {
   isCurrentStep?: boolean
   opacity: number
-  label?: string | React.ReactNode
+  label?: string | React.ReactNode,
+  indexNo?: number,
   description?: string | null
 }
 
@@ -969,6 +972,7 @@ const StepLabel = ({
                      isCurrentStep,
                      opacity,
                      label,
+                     indexNo,
                      description,
                    }: StepLabelProps) => {
   const { variant, styles, size, orientation } = useStepper()
@@ -984,22 +988,36 @@ const StepLabel = ({
         variant === "circle-alt" && "text-center",
         variant === "circle-alt" && orientation === "horizontal" && "ms-0",
         variant === "circle-alt" && orientation === "vertical" && "text-start",
-        styles?.["step-label-container"]
+        styles?.["step-label-container"],
+        "font-semibold text-primary"
       )}
       style={{
         opacity,
       }}
     >
       {!!label && (
+        <div className={"flex gap-x-2"}>
         <span
           className={cn(
             "stepper__step-label",
             labelVariants({ size }),
-            styles?.["step-label"]
+            styles?.["step-label"],
+            "text-2xl"
+          )}
+        >
+          {indexNo + 1}
+        </span>
+        <span
+          className={cn(
+          "stepper__step-label",
+            labelVariants({ size }),
+            styles?.["step-label"],
+            "text-lg flex flex-col justify-end"
           )}
         >
           {label}
         </span>
+        </div>
       )}
       {!!description && (
         <span
