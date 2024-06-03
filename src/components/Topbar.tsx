@@ -6,7 +6,7 @@ import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import { cx } from "./common.ts";
 import TopbarButtons from "./TopbarButtons.tsx";
-
+import Profile from "./Profile.tsx";
 const templates = [
   { name: 'Template 1', value: 'Template1' },
   { name: 'Template 2', value: 'Template2' }
@@ -88,6 +88,8 @@ export default function Topbar({
           // @ts-ignore
           setSidebarState={setSidebarState}
         />
+        <Profile></Profile>
+
       </WithEditor>
     </div>
   );
