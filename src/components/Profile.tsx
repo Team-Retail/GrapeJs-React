@@ -77,13 +77,14 @@ function editDetails(){
             </tbody>
           </table>
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", marginTop: "40px" }}>
-            <button type="button" className="btn btn-primary" onClick={() => {
+            <Button variant="contained" onClick={() => {
               setRedirect(true);
-            }}>LogOut
-            </button>
-            <button type="button" className="btn btn-primary" onClick={()=>{
+            }}>LogOut</Button>
+
+            <Button variant="contained" onClick={()=>{
               navigate("/editDetails");
-            }}>Edit Details</button>
+            }}>Edit Details</Button>
+
           </div>
         </div>
       </Popover>
