@@ -41,7 +41,7 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
     return path.substring(1, path.lastIndexOf('/'));
   };
 
-  const groupByPage = (images: Image[]): GroupedImages => {
+  const groupByPage = (images: Image[], colorPaletteTexts: { [key: string]: string }): GroupedImages => {
     const groupedImages: PageImages = {};
     const groupedIcons: PageImages = {};
     const groupedColorPalette: PageImages = {};
@@ -70,8 +70,19 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       }
     });
 
+    // Add color palette text as parsed hex values
+    Object.keys(colorPaletteTexts).forEach(page => {
+      const hexValues = colorPaletteTexts[page].trim().split('\n');
+      groupedColorPalette[page] = hexValues.map((hex, index) => ({
+        key: `${page}/color_palette_${index}.txt`,
+        url: hex
+      }));
+    });
+
     return { images: groupedImages, icons: groupedIcons, color_palette: groupedColorPalette };
   };
+
+
 
   const handleUploadTest = async () => {
     setLoading(true);
@@ -86,13 +97,28 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       url: `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${obj.Key}`
     }));
 
-    const groupedData = groupByPage(images);
+    // Fetch and process color_palette.txt files
+    const colorPaletteTextFiles = objects.filter(obj => obj.Key.endsWith('color_palette.txt'));
+    const colorPaletteTexts = {};
+
+    for (const file of colorPaletteTextFiles) {
+      const response = await fetch(`https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${file.Key}`);
+      const text = await response.text();
+      const match = file.Key.match(/\/(\d+)\//);
+      if (match) {
+        const page = match[1];
+        colorPaletteTexts[page] = text;
+      }
+    }
+
+    const groupedData = groupByPage(images, colorPaletteTexts);
     setGroup(groupedData);
     if (Object.keys(groupedData.images).length > 0) {
       setSelectedPage(Object.keys(groupedData.images)[0]);
     }
     setLoading(false);
   };
+
 
   useEffect(() => {
     handleUploadTest();
@@ -105,6 +131,8 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
   const handleDragStart = (event, image) => {
     event.dataTransfer.setData('text/plain', image.url);
   };
+
+  console.log(group)
 
   return (
     <Accordion expanded={expanded} onChange={onChange} className='!bg-[#B5DFFF] !bg-opacity-30'>
@@ -198,23 +226,27 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
           <div className="flex border-b py-2 justify-between">
             <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Color Palette</h1>
           </div>
-          {/* {loading ? (
-            <div className="mt-4 flex flex-wrap h-[300px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              {[...Array(8)].map((_, index) => (
-                <Skeleton key={index} animation="wave" variant="rounded" width={112} height={112} />
-              ))}
-            </div>
-          ) : (
-            <div className="mt-4 flex flex-wrap h-[300px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              <SuspenseImage
-                key={group?.color_palette[selectedPage][0]?.url}
-                src={group?.color_palette[selectedPage][0]?.url}
-                alt={`Page ${selectedPage} Icon `}
-                className="w-20 h-20 rounded-lg mb-4"
-              />
+          {loading ? (
+            <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
+              <Skeleton  animation="wave" variant="rounded" className='w-full h-5' />
              
             </div>
-          )} */}
+          ) : (
+            <div className="mt-4 flex h-auto items-center justify-center gap-2">
+              {group.color_palette[selectedPage]?.map((item, index) => (
+                item.url.startsWith('#') ? (
+                  <ColorPalette key={index} hexValues={item.url.split('\n')} />
+                ) : (
+                  <SuspenseImage
+                    key={item.url}
+                    src={item.url}
+                    alt={`Page ${selectedPage} Color Palette ${index}`}
+                    className="w-20 h-20 rounded-lg mb-4"
+                  />
+                )
+              ))}
+            </div>
+          )}
         </div>
       </AccordionDetails>
     </Accordion>
@@ -243,3 +275,22 @@ const SuspenseImage = ({ src, alt, ...props }) => {
     </Suspense>
   );
 };
+
+
+const ColorPalette = ({ hexValues }) => {
+  return (
+    <div className="w-full flex h-5">
+      {hexValues.map((hex, index) => (
+        <div
+          key={index}
+          className={`h-5 border  `}
+          style={{
+            backgroundColor: hex,
+            width: `${100 / hexValues.length}%`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
