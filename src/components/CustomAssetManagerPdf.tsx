@@ -15,7 +15,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
 
-export default function CustomAssetManagerPdf() {
+export default function CustomAssetManagerPdf({close}) {
   const [assets, setAssets] = useState([])
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -81,6 +81,7 @@ export default function CustomAssetManagerPdf() {
         
         editor.Assets.add({ src: fileUrl });
         setAssets(editor.Assets.getAll().models)
+        close()
       } catch (error) {
         console.error('Error uploading file:', error);
       }

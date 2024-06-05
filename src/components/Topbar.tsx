@@ -24,7 +24,7 @@ export default function Topbar({
 
 
   return (
-    <div className="flex items-center  bg-[#EAF6FF] fixed m-6 w-[95%] p-2 text-center z-50 rounded-xl">
+    <div className="flex items-center  bg-[#EAF6FF] fixed my-6 !mx-auto w-[95%] p-2 text-center z-50 rounded-xl">
       <img src="/CAI logo.png" alt="logo" className="h-8 w-8 ml-4 mr-8" />
 
       <FormControl variant="outlined" className="ml-auto">

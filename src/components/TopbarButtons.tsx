@@ -235,6 +235,7 @@ export default function TopbarButtons({
 
         close={() => setOpenUpload(false)}
       ><CustomAssetManagerPdf
+          close={() => setOpenUpload(false)}
 
         /></CustomModal>
       <Modal

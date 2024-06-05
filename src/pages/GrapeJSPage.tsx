@@ -317,7 +317,7 @@ export default function GrapeJSPage() {
   return (
     <ThemeProvider theme={theme}>
       <GjsEditor
-        className="gjs-custom-editor text-white bg-white"
+        className="gjs-custom-editor text-white  bg-white"
         grapesjs="https://unpkg.com/grapesjs"
         grapesjsCss="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
         options={gjsOptions}
