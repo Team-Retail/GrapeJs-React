@@ -269,7 +269,7 @@ export default function GrapeJSPage() {
 
   const userFunc = () => {
     const user = JSON.parse(localStorage.getItem("userDetails"))
-    console.log("user",user)
+    console.log("user", user)
     if (!user) {
       navigate("/")
     }
@@ -302,7 +302,7 @@ export default function GrapeJSPage() {
     editor.loadProjectData(initialData);
   };
 
-  const handleTemplateChange =async (template) => {
+  const handleTemplateChange = async (template) => {
     setSelectedTemplate(template);
     // Reload the editor with the new template
     // @ts-ignore
@@ -351,15 +351,19 @@ export default function GrapeJSPage() {
           )}
         </ModalProvider>
         <AssetsProvider>
-          {({ assets, select, close, Container }) => (
-            <Container>
-              <CustomAssetManager
-                assets={assets}
-                select={select}
-                close={close}
-              />
-            </Container>
-          )}
+          {(props) => {
+            const { assets, select, close, Container } = props
+            // console.log("home",props)
+            return (
+              <Container className="!bg-white opacity-100">
+                <CustomAssetManager
+                  assets={assets}
+                  select={select}
+                  close={close}
+                />
+              </Container>
+            )
+          }}
         </AssetsProvider>
       </GjsEditor>
     </ThemeProvider>

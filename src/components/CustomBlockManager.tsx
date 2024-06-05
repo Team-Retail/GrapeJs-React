@@ -16,9 +16,9 @@ export default function CustomBlockManager({
     <div className="gjs-custom-block-manager text-left">
       {Array.from(mapCategoryBlocks).map(([category, blocks]) => (
         <div key={category}>
-          <div className={cx("py-2 px-4 border-y", MAIN_BORDER_COLOR)}>
+          {/* <div className={cx("py-2 px-4 border-y", MAIN_BORDER_COLOR)}>
             {category}
-          </div>
+          </div> */}
           <div className="grid grid-cols-2 gap-2 p-2">
             {blocks.map((block) => (
               <div

@@ -201,7 +201,7 @@ export default function StylePropertyField({
               />
             )}
             <button type="button" onClick={openAssets} className={BTN_CLS}>
-              Select Image
+              Select Image now
             </button>
           </div>
         );

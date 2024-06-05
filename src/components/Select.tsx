@@ -21,7 +21,6 @@ const Select: React.FC<SelectProps> = ({submitForm}) => {
   };
 
   const handleButtonClick = async () => {
-    console.log("button click")
     if (!selectedFrame) {
       alert("select frame")
     }

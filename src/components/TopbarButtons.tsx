@@ -3,14 +3,10 @@ import {
   mdiArrowULeftTop,
   mdiArrowURightTop,
   mdiBrush,
+  mdiCloudUpload,
   mdiCog,
-  mdiFullscreen,
-  mdiImage,
   mdiLayers,
-  mdiLoading,
-  mdiTextBoxMultiple,
-  mdiUpload,
-  mdiViewGridPlus,
+  mdiLoading
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import Box from "@mui/material/Box";
@@ -20,8 +16,15 @@ import QRCode from "qrcode.react";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/base.ts";
-import { cx } from "./common.ts";
 import { User } from "../utils/types.ts";
+import { cx } from "./common.ts";
+
+import publish from "../assets/publish.png";
+import upload from "../assets/upload.svg";
+import CustomModal from "./CustomModal.tsx";
+import CustomAssetManagerPdf from "./CustomAssetManagerPdf.tsx";
+import { listObjects } from "../utils/helpers.ts";
+
 
 
 
@@ -60,15 +63,15 @@ export default function TopbarButtons({
   const [coded, setCoded] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [openUpload, setOpenUpload] = useState(false)
 
   useEffect(() => {
     const cmdEvent = "run stop";
     const onCommand = (id: string) => {
-      console.log("command id:", id);
       cmdButtons.find((btn) => btn.id === id);
     };
     editor.on(cmdEvent, onCommand);
-  
+
     return () => {
       editor.off(cmdEvent, onCommand);
     };
@@ -98,25 +101,25 @@ export default function TopbarButtons({
 
 
       const blob = new Blob([completeHtml], { type: 'text/html' });
-      const user:User = JSON.parse(localStorage.getItem('userDetails') )
-      const usernameFolder = user.companyName+"_"+user.email
+      const user: User = JSON.parse(localStorage.getItem('userDetails'))
+      const usernameFolder = user.companyName + "_" + user.email
 
 
       const formData = new FormData();
-      formData.append('file', blob, `template-{${user._id}}.html`); 
-      formData.append('fieldName', usernameFolder); 
+      formData.append('file', blob, `template-{${user._id}}.html`);
+      formData.append('fieldName', usernameFolder);
       formData.append('userId', user._id);
-      
-     
-      const ress = await axios.post(BASE_URL + "/api/auth/uploadHtml",formData);
+
+
+      const ress = await axios.post(BASE_URL + "/api/auth/uploadHtml", formData);
       console.log(ress)
-      if(ress.status===200){
+      if (ress.status === 200) {
         setCoded(ress.data.code)
         setUrl(ress.data.url)
         setOpen(true);
       }
 
-   
+
     } catch (error) {
       console.error("Error uploading file:", error);
       alert("Failed to upload file.");
@@ -143,11 +146,7 @@ export default function TopbarButtons({
   };
 
   const cmdButtons: CommandButton[] = [
-    {
-      id: "core:fullscreen",
-      iconPath: mdiFullscreen,
-      options: { target: "#root" },
-    },
+
     {
       id: "core:undo",
       iconPath: mdiArrowULeftTop,
@@ -158,10 +157,7 @@ export default function TopbarButtons({
       iconPath: mdiArrowURightTop,
       disabled: () => !UndoManager.hasRedo(),
     },
-    {
-      id: "core:image",
-      iconPath: mdiImage,
-    },
+
     {
       id: "core:brush",
       iconPath: mdiBrush,
@@ -170,21 +166,15 @@ export default function TopbarButtons({
       id: "core:settings",
       iconPath: mdiCog,
     },
-    {
-      id: "core:layers",
-      iconPath: mdiLayers,
-    },
-    {
-      id: "core:grid",
-      iconPath: mdiViewGridPlus,
-    },
-    {
-      id: "core:text",
-      iconPath: mdiTextBoxMultiple,
-    },
+
     {
       id: "core:upload",
-      iconPath: isLoading ? mdiLoading : mdiUpload,
+      iconPath: mdiCloudUpload,
+      disabled: () => isLoading,
+    },
+    {
+      id: "core:publish",
+      iconPath: isLoading ? mdiLoading : publish,
       disabled: () => isLoading,
     },
   ];
@@ -206,17 +196,25 @@ export default function TopbarButtons({
     }
   };
 
+
+  
+
   // Add the custom upload command to GrapesJS
   useEffect(() => {
+    editor.Commands.add("core:publish", {
+      run: (handleUpload),
+    });
     editor.Commands.add("core:upload", {
-      run: handleUpload,
+      run: () => setOpenUpload(true)
     });
     editor.Commands.add("core:image", {
       run: () => {
-        const inputElement = document.getElementById(
-          "imageUploadInput",
-        ) as HTMLInputElement;
-        inputElement?.click();
+        // const inputElement = document.getElementById(
+        //   "imageUploadInput",
+        // ) as HTMLInputElement;
+        // inputElement?.click();
+
+        // alert("hello")
       },
     });
   }, [editor]);
@@ -230,6 +228,15 @@ export default function TopbarButtons({
         accept="image/*"
         onChange={handleImageUpload}
       />
+      <CustomModal
+        open={openUpload}
+        title={"Upload"}
+
+
+        close={() => setOpenUpload(false)}
+      ><CustomAssetManagerPdf
+
+        /></CustomModal>
       <Modal
         open={open}
         onClose={() => {
@@ -260,13 +267,20 @@ export default function TopbarButtons({
             key={id}
             type="button"
             className={cx(
-              // BTN_CLS,
-              // MAIN_BORDER_COLOR,
-              id !== "core:upload" && "rounded text-[#000000B8] p-2",
-              id === "core:upload" &&
-                "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] text-white",
+
+              id !== "core:publish" && "rounded text-[#000000B8] p-2",
+
+              id !== "core:upload" && "rounded text-[#000000B8] p-2 ",
+
+              id === "core:publish" &&
+              "flex flex-row items-center rounded p-2 px-3 bg-[#1D85E6] hover:!bg-blue-700  text-white",
+
               activeTab === id && "text-[#1D85E6] bg-[#D1EAFF]",
-              // Commands.isActive(id) && "text-[#1D85E6]",
+
+              id === "core:upload" &&
+              "flex flex-row items-center rounded p-2 px-3 bg-white transition-colors duration-300 hover:!bg-gray-300 text-white",
+              activeTab === id && "textblack bg-[#D1EAFF]",
+
               disabled?.() && "opacity-50",
             )}
             onClick={() => handleButtonClick(id, options)}
@@ -276,20 +290,33 @@ export default function TopbarButtons({
               path={iconPath}
               size={1}
               className={cx(
-                id === "core:upload" && isLoading && "animate-spin",
+                id === "core:publish" && isLoading && "animate-spin",
+                id === "core:upload" && "hidden",
+                id === "core:publish" && "hidden",
               )}
             />
             {id === "core:upload" && (
+              <img src={upload} alt="" />
+            )}
+            {id === "core:publish" && (
+              <img src={publish} alt="" />
+            )}
+            {id === "core:publish" && (
               <p className="text-white text-sm pl-1">Publish</p>
+            )}
+            {id === "core:upload" && (
+              <p className="text-gray-700 font-manrope font-semibold text-sm pl-1">Upload</p>
             )}
           </button>
         ))}
       </div>
-      {showAlert && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded shadow-lg z-50">
-          Image has been added
-        </div>
-      )}
-    </div>
+      {
+        showAlert && (
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded shadow-lg z-50">
+            Image has been added
+          </div>
+        )
+      }
+    </div >
   );
 }
