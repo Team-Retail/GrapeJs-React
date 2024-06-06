@@ -27,7 +27,6 @@ const SidebarTabComponent = () => {
   const [expandedAccordion, setExpandedAccordion] = useState<string | false>(false);
 
   const saveData = async () => {
-    console.log("save data called");
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
 
     try {
@@ -48,9 +47,7 @@ const SidebarTabComponent = () => {
   useEffect(() => {
     setAssets(editor.Assets.getAll());
     editor.on('asset', (args) => {
-      console.log(args);
       if (args.event === "update") {
-        console.log("Updated models:", args.model.models);
         setAssets(args.model.models);
         setValue(1);
 
@@ -65,17 +62,15 @@ const SidebarTabComponent = () => {
         saveData();
       }
       if (args.event === "reset") {
-        console.log("reset", args.model.models);
         setAssets(args.model.models);
       }
     });
   }, [editor, assets]);
 
   const pdfAssets = useMemo(() => {
-    return assets.filter(a => a.get('src').includes("ai-processed-pdf"));
+    return assets;
   }, [assets]);
 
-  console.log("assets", assets, pdfAssets);
 
   const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedAccordion(isExpanded ? panel : false);

@@ -48,7 +48,7 @@ export default function CustomAssetManagerPdf({close}) {
       const file = files[0];
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('s3_id', user._id + ":" + file.name);
+      formData.append('s3_id', user._id + ":" + file.name.replace("-",""));
 
       let apiUrl;
       const fileType = file.type;
