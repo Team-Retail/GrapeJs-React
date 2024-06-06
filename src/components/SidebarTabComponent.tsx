@@ -90,7 +90,7 @@ const SidebarTabComponent = () => {
             }}
           />
           <Tab
-            label="Ai Extract"
+            label="Components"
             {...a11yProps(1)}
             sx={{
               background: value === 1 ? 'linear-gradient(to right, #1D85E6, #81C0F7)' : '#6C6C6C',
