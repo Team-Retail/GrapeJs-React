@@ -23,6 +23,7 @@
     "@grapesjs/react": "^0.1.0",
     "@mdi/js": "^7.2.96",
     "@mdi/react": "^1.6.1",
+    "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.13.7",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@react-google-maps/api": "^2.19.3",
