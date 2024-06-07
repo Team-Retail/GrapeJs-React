@@ -48,7 +48,7 @@ const EmailVerification = () => {
       <div className={"flex flex-col items-center justify-center h-screen font-manrope text-xl"}>
          <CheckCircleIcon style={{ fontSize: '6rem', color: 'green' }}></CheckCircleIcon>
         { message && <h2 className="alert alert-info">{message}</h2>}
-         <h2 >Redirecting to Login Page {count}</h2>
+         <h2 >Redirecting to Login Page {count} </h2>
       </div>
     </div>
   );
