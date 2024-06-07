@@ -1,57 +1,45 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import pdficon from "../assets/pdficon.png";
+import clipboard from "../assets/clipboard.png";
 
 import Icon from '@mdi/react';
-import { mdiChevronDown } from '@mdi/js';
+import { mdiChevronDown, mdiLoading,  } from '@mdi/js';
 import { listObjects } from '../utils/helpers';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 const LazyImage = lazy(() => import('./LazyImage'));
 
 import { Skeleton } from '@mui/material';
+import ColorPalette from './ColorPalette';
+import { GroupedImages } from '../utils/types';
+import axios from 'axios';
+import { BASE_URL, BASE_URL_PYTHON } from '../utils/base';
 
-interface Image {
-  key: string;
-  url: string;
-}
-
-interface PageImages {
-  [key: string]: Image[];
-}
-
-interface GroupedImages {
-  images: PageImages;
-  color_palette: PageImages;
-  icons: PageImages;
-  full_text: PageImages;
-}
 
 const PdfAccordion = ({ item, expanded, onChange }) => {
-  const [group, setGroup] = useState<GroupedImages>({ images: {}, icons: {}, color_palette: {}, full_text: {} });
+  const [group, setGroup] = useState<GroupedImages>({ images: {}, icons: {}, color_palette: {}, full_text: {}, sub_text: {} });
   const [selectedPage, setSelectedPage] = useState<string | number>('1');
   const [loading, setLoading] = useState(true);
   const [pageNumbers, setPageNumbers] = useState<Set<string>>(new Set());
+  const [status, setStatus] = useState<"completed" | "processing" | "fetching" | "failed">("fetching")
+  const [feature, setFeature] = useState<number | null>()
+  const url = item.get("src").split("~")
 
-
-  const itemUrl = item.get("src");
+  const itemUrl = url[0];
   const bool = !itemUrl.includes(".pdf")
+  const intervalRef = useRef(null);
 
 
-
-
-
-
-
-
-  const groupByPage = (images, colorPaletteTexts, fullTexts) => {
+  const groupByPage = (images, colorPaletteTexts, fullTexts, subText) => {
     const groupedImages = {};
     const groupedIcons = {};
     const groupedColorPalette = {};
     const groupedFullText = {};
+    const groupedSubText = {}
     const pageNumbersSet = new Set<string>();
 
     images.forEach(image => {
@@ -90,15 +78,20 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       groupedFullText[page] = [{ key: `${page}/full_text.txt`, url: fullTexts[page] }];
     });
 
+    Object.keys(subText).forEach(page => {
+      pageNumbersSet.add(page);
+      groupedSubText[page] = subText[page].map((text, index) => ({
+        key: `${page}/text_block_${index}.txt`,
+        url: text
+      }));
+    });
+
+
+
     setPageNumbers(pageNumbersSet);
 
-    return { images: groupedImages, icons: groupedIcons, color_palette: groupedColorPalette, full_text: groupedFullText };
+    return { images: groupedImages, icons: groupedIcons, color_palette: groupedColorPalette, full_text: groupedFullText, sub_text: groupedSubText };
   };
-
-
-
-
-
 
 
   const handleUploadTest = async () => {
@@ -126,7 +119,6 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       "color_palette.txt"
       const temp = file.Key.split("/color_palette.txt")[0].split("/")
       const index = parseInt(temp[temp.length - 1])
-      console.log("index:", index, text, itemUrl)
       if (index) {
         if (file.Key.includes("ai-processed-image")) {
           colorPaletteTexts[1] = text;
@@ -134,11 +126,7 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
         }
         else colorPaletteTexts[index] = text;
       }
-      // const match = file.Key.match(/ai-processed-image\/[^/]+\/text\/color_palette\.txt$/);
-      // if (match) {
-      //   const page = match[1] === 'ai-processed-image' ? '1' : match[2];
-      //   colorPaletteTexts[page] = text;
-      // }
+
     }
 
     const fullTextFiles = objects.filter(obj => obj.Key.endsWith('full_text.txt'));
@@ -150,7 +138,6 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       // const match = file.Key.match(/ai-processed-image\/[^/]+\/text\/full_text\.txt$/);
       const temp = file.Key.split("/text/full_text.txt")[0].split("/")
       const index = parseInt(temp[temp.length - 1])
-      console.log(index, text, itemUrl)
       if (index) {
         if (file.Key.includes("ai-processed-image")) {
           fullTexts[1] = text;
@@ -158,15 +145,35 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
         }
         else fullTexts[index] = text;
       }
-      // console.log(match,file.Key)
-      // if (match) {
-      //   const page = match[1] === 'ai-processed-image' ? '1' : match[2];
-      //   fullTexts[page] = text;
-      // }
+
+    }
+
+    const textBlockFiles = objects.filter(obj => obj.Key.match(/text_block_\d+\.txt$/));
+
+    const subTexts = {};
+
+    for (const file of textBlockFiles) {
+      const response = await fetch(`https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${file.Key}`);
+      const text = await response.text();
+      // const match = file.Key.match(/ai-processed-image\/[^/]+\/text\/full_text\.txt$/);
+      const temp = file.Key.split("/text/text_block")[0].split("/")
+      let index = parseInt(temp[temp.length - 1])
+      if (index) {
+        if (file.Key.includes("ai-processed-image")) {
+          index = 1
+        }
+        if (!subTexts[index]) {
+          subTexts[index] = [];
+        }
+        subTexts[index].push(text);
+      }
+
     }
 
 
-    const groupedData = groupByPage(images, colorPaletteTexts, fullTexts);
+
+
+    const groupedData = groupByPage(images, colorPaletteTexts, fullTexts, subTexts);
     setGroup(groupedData);
     if (Object.keys(groupedData.images).length > 0) {
       setSelectedPage(Object.keys(groupedData.images)[0]);
@@ -174,20 +181,39 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
     setLoading(false);
   };
 
+  const handleGetStatus = async () => {
+    const session = url[1]
+    const resp = await axios.get(BASE_URL_PYTHON + "/session_status/" + session)
+    if (resp.data.failed === true) {
+      setStatus('failed');
+      clearInterval(intervalRef.current);
+    } else if (resp.data.completed === true) {
+      setStatus('completed');
+      clearInterval(intervalRef.current);
+    } else {
+      setStatus('processing');
+      setFeature(resp.data.upload_count);
+    }
+    console.log("status", resp.data);
 
-
-
-
+  }
 
 
 
   useEffect(() => {
-    handleUploadTest();
-  }, [itemUrl]);
+     handleGetStatus();
+    intervalRef.current = setInterval(async () => {
+      await handleGetStatus();
+    }, 10000); 
+    return () => clearInterval(intervalRef.current); // Cleanup interval on unmount
+  }, []);
 
+  useEffect(() => {
+    if (status === 'completed') {
+      handleUploadTest();
+    }
+  }, [status]);
 
-
-  console.log("group", group, itemUrl)
 
   const handlePageChange = (event) => {
     setSelectedPage(event.target.value);
@@ -205,6 +231,32 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
     return splitItemUrl[2].split("-")[0];
   };
 
+  const handleCopy = async (text) => {
+    await navigator.clipboard.writeText(text)
+  }
+
+  if(status==="failed") return <></>
+  if(status==="processing") return (
+    <div className="w-full flex flex-col gap-1 p-2 bg-[#B5DFFF] !bg-opacity-30 rounded-md shadow-md">
+      <Typography className='flex gap-1'>
+        <img src={pdficon} alt="" className='w-7 h-7' />
+        {getFileName()}
+      </Typography>
+      <div className="flex gap-3 items-center ">
+        <Icon path={mdiLoading } size={1} className={ "animate-spin text-blue-500"} />
+        <p className='text-xs font-manrope text-gray-500 font-semibol'>
+
+        {feature} Features Extracted
+        </p>
+
+      </div>
+    </div>
+  )
+
+  if(status==="fetching"){
+    return(<Skeleton sx={{ bgcolor: "#B5DFFF" }} className='w-full' animation="wave" variant="rounded"  height={60} />)
+  }
+
   return (
     <Accordion expanded={expanded} onChange={onChange} className='!bg-[#B5DFFF] !bg-opacity-30'>
       <AccordionSummary
@@ -219,128 +271,156 @@ const PdfAccordion = ({ item, expanded, onChange }) => {
       </AccordionSummary>
       <AccordionDetails>
         <div className="w-full bg-white p-3 rounded-lg flex flex-col">
-          <div className="flex border-b justify-between">
-            <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Image Components</h1>
-            <div className="flex gap-1 ">
-              <span className='text-xs font-manrope my-auto text-gray-700 font-semibold'>Page:</span>
-              <Select
-                value={selectedPage}
-                onChange={handlePageChange}
-                displayEmpty
-                inputProps={{ 'aria-label': 'Select Page' }}
-                sx={{
-                  color: "black",
-                  "& .MuiSelect-icon": {
+          <>
+            <div className="flex border-b justify-between">
+              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Image Components</h1>
+              <div className="flex gap-1 ">
+                <span className='text-xs font-manrope my-auto text-gray-700 font-semibold'>Page:</span>
+                <Select
+                  value={selectedPage}
+                  onChange={handlePageChange}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Select Page' }}
+                  sx={{
                     color: "black",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    paddingTop: "4px",
-                    paddingBottom: "4px",
-                  },
-                  "& .MuiSelect-select": {
-                    paddingTop: "4px",
-                    paddingBottom: "4px",
-                  },
-                }}
-              >
-                {[...pageNumbers].map(page => (
-                  <MenuItem key={page} value={page}>
-                    {page}
-                  </MenuItem>
+                    "& .MuiSelect-icon": {
+                      color: "black",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      paddingTop: "4px",
+                      paddingBottom: "4px",
+                    },
+                    "& .MuiSelect-select": {
+                      paddingTop: "4px",
+                      paddingBottom: "4px",
+                    },
+                  }}
+                >
+                  {[...pageNumbers].map(page => (
+                    <MenuItem key={page} value={page}>
+                      {page}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+            </div>
+            {loading ? (
+              <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px]scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
+                {[...Array(8)].map((_, index) => (
+                  <Skeleton sx={{ bgcolor: "#B5DFFF" }} key={index} animation="wave" variant="rounded" width={112} height={112} />
                 ))}
-              </Select>
-            </div>
-          </div>
-          {loading ? (
-            <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px]scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              {[...Array(8)].map((_, index) => (
-                <Skeleton key={index} animation="wave" variant="rounded" width={112} height={112} />
-              ))}
-            </div>
-          ) : group.images[selectedPage]?.length > 0 ? (
-            <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-start justify-start  gap-2">
-              {group.images[selectedPage].map((image, index) => (
-                <SuspenseImage
-                  key={image.url}
-                  src={image.url}
-                  alt={`Page ${selectedPage} Image ${index}`}
-                  className="w-28 h-28 rounded-lg mb-4 shadow-lg"
-                  draggable
-                  onDragStart={(event) => handleDragStart(event, image)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No images found</p>
-          )}
-          <div className="flex border-b py-2 justify-between">
-            <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Icon Components</h1>
-          </div>
-          {loading ? (
-            <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              {[...Array(8)].map((_, index) => (
-                <Skeleton key={index} animation="wave" variant="rounded" width={112} height={112} />
-              ))}
-            </div>
-          ) : group.icons[selectedPage]?.length > 0 ? (
-              <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-start justify-start gap-2">
-              {group.icons[selectedPage].map((image, index) => (
-                <SuspenseImage
-                  key={image.url}
-                  src={image.url}
-                  alt={`Page ${selectedPage} Icon ${index}`}
-                  className="w-[72px] h-[72px] rounded-lg mb-4 shadow-lg"
-                  draggable
-                  onDragStart={(event) => handleDragStart(event, image)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No icons found</p>
-          )}
-          <div className="flex border-b py-2 justify-between">
-            <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Color Palette</h1>
-          </div>
-          {loading ? (
-            <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              <Skeleton animation="wave" variant="rounded" className='w-full h-5' />
-            </div>
-          ) : group.color_palette[selectedPage]?.length > 0 ? (
-            <div className="mt-4 flex h-auto items-center justify-center gap-2">
-              {group.color_palette[selectedPage].map((item, index) => (
-                item.url.startsWith('#') ? (
-                  <ColorPalette key={index} hexValues={item.url.split('\n')} />
-                ) : (
+              </div>
+            ) : group.images[selectedPage]?.length > 0 ? (
+              <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-start justify-start  gap-2">
+                {group.images[selectedPage].map((image, index) => (
                   <SuspenseImage
-                    key={item.url}
-                    src={item.url}
-                    alt={`Page ${selectedPage} Color Palette ${index}`}
-                    className="w-20 h-20 rounded-lg mb-4"
+                    key={image.url}
+                    src={image.url}
+                    alt={`Page ${selectedPage} Image ${index}`}
+                    className="w-28 h-28 rounded-lg mb-4 shadow-lg"
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, image)}
                   />
-                )
-              ))}
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No images found</p>
+            )}
+          </>
+
+
+          <>
+            <div className="flex border-b py-2 justify-between">
+              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Icon Components</h1>
             </div>
-          ) : (
-            <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No color palette found</p>
-          )}
-          <div className="flex border-b py-2 justify-between">
-            <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Full Text</h1>
-          </div>
-          {loading ? (
-            <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-              <Skeleton animation="wave" variant="rounded" className='w-full h-5' />
+            {loading ? (
+              <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
+                {[...Array(8)].map((_, index) => (
+                  <Skeleton sx={{ bgcolor: "#B5DFFF" }} key={index} animation="wave" variant="rounded" width={112} height={112} />
+                ))}
+              </div>
+            ) : group.icons[selectedPage]?.length > 0 ? (
+              <div className="mt-4 flex flex-wrap h-full max-h-[300px] min-h-[200px] scrollbar-thin overflow-y-scroll items-start justify-start gap-2">
+                {group.icons[selectedPage].map((image, index) => (
+                  <SuspenseImage
+                    key={image.url}
+                    src={image.url}
+                    alt={`Page ${selectedPage} Icon ${index}`}
+                    className="w-[72px] h-[72px] rounded-lg mb-4 shadow-lg"
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, image)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No icons found</p>
+            )}
+          </>
+
+
+          <>
+            <div className="flex border-b py-2 justify-between">
+              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'> Text Components</h1>
+              {group.full_text[selectedPage]?.length > 0 && group.full_text[selectedPage][0]?.url?.length > 0 && (<button onClick={() => {
+                handleCopy(group.full_text[selectedPage][0]?.url)
+              }} className="my-auto outline-none border-none bg-transparent">
+                <img src={clipboard} alt="" className='w-5 h-5' />
+              </button>)}
             </div>
-          ) : group.full_text[selectedPage]?.length > 0 && group.full_text[selectedPage][0]?.url?.length>0 ? (
-            <div className="mt-4 flex h-auto text-xs items-center justify-center gap-2">
-              {group.full_text[selectedPage].map((item, index) => (
-                <Typography key={index} className="!text-xs text-gray-700">
-                  {item.url} 
-                </Typography>
-              ))}
+            {loading ? (
+              <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
+                <Skeleton sx={{ bgcolor: "#B5DFFF" }} animation="wave" variant="rounded" className='w-full h-5' />
+              </div>
+            ) : group.full_text[selectedPage]?.length > 0 && group.full_text[selectedPage][0]?.url?.length > 0 ? (
+              <p className="mt-4 flex flex-col gap-2 leading-5 px-2 text-justify h-full max-h-[300px] min-h-[200px]  text-xs overflow-y-scroll scrollbar-thin   ">
+                {group.sub_text[selectedPage].map((item, index) => (
+                  <span onClick={() => {
+                    handleCopy(item.url)
+                  }} key={index} className="relative  p-2 border border-gray-200 rounded-sm   h-fit  text-left w-full hover:bg-sky-500/20  bg-sky-100/70 text-gray-700 cursor-pointer hover:text-black">
+                    {/* <button onClick={()=>{
+                        handleCopy(item.url)
+                    }} className="absolute right-1 top-1 outline-none border-none bg-transparent">
+                      <img src={clipboard} alt="" className='w-5 h-5' />
+                    </button> */}
+                    {item.url}
+                  </span>
+                ))}
+              </p>
+            ) : (
+              <p className="mt-4 text-center text-gray-500 h-[40px] flex justify-center items-center">No  text found</p>
+            )}
+          </>
+
+          <>
+
+            <div className="flex border-b py-2 justify-between">
+              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Color Palette</h1>
             </div>
-          ) : (
-            <p className="mt-4 text-center text-gray-500 h-[40px] flex justify-center items-center">No  text found</p>
-          )}
+            {loading ? (
+              <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
+                <Skeleton sx={{ bgcolor: "#B5DFFF" }} animation="wave" variant="rounded" className='w-full h-5' />
+              </div>
+            ) : group.color_palette[selectedPage]?.length > 0 ? (
+              <div className="mt-4 flex h-auto items-center justify-center gap-2">
+                {group.color_palette[selectedPage].map((item, index) => (
+                  item.url.startsWith('#') ? (
+                    <ColorPalette key={index} hexValues={item.url.split('\n')} />
+                  ) : (
+                    <SuspenseImage
+                      key={item.url}
+                      src={item.url}
+                      alt={`Page ${selectedPage} Color Palette ${index}`}
+                      className="w-20 h-20 rounded-lg mb-4"
+                    />
+                  )
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No color palette found</p>
+            )}
+          </>
+
+
         </div>
       </AccordionDetails>
     </Accordion>
@@ -357,7 +437,7 @@ const SuspenseImage = ({ src, alt, ...props }) => {
   }, [src]);
 
   return (
-    <Suspense fallback={<Skeleton animation="wave" variant="rounded" width={112} height={112} {...props} />}>
+    <Suspense fallback={<Skeleton sx={{ bgcolor: "#eff8ff" }} animation="wave" variant="rounded" width={112} height={112} {...props} />}>
       <LazyImage
         src={src}
         alt={alt}
@@ -367,22 +447,5 @@ const SuspenseImage = ({ src, alt, ...props }) => {
         {...props}
       />
     </Suspense>
-  );
-};
-
-const ColorPalette = ({ hexValues }) => {
-  return (
-    <div className="w-full flex h-5">
-      {hexValues.map((hex, index) => (
-        <div
-          key={index}
-          className={`h-5 border`}
-          style={{
-            backgroundColor: hex,
-            width: `${100 / hexValues.length}%`
-          }}
-        />
-      ))}
-    </div>
   );
 };

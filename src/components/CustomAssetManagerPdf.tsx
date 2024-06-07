@@ -1,19 +1,14 @@
-import { AssetsResultProps, useEditor } from "@grapesjs/react";
-import { mdiClose, mdiLoading } from "@mdi/js";
+import { useEditor } from "@grapesjs/react";
+import { mdiCloudUploadOutline, mdiLoading } from "@mdi/js";
 import Icon from "@mdi/react";
-import type { Asset } from "grapesjs";
-import { BTN_CLS } from "./common.ts";
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import axios from "axios";
-import { BASE_URL } from "../utils/base.ts";
+import type { Asset } from "grapesjs";
+import { useState } from "react";
 const saveJsonApiUrl = "http://54.227.212.214:5000/upload";
 const savePdfApiUrl = "http://54.227.212.214:5000/upload_pdf";
-import { mdiCloudUploadOutline } from '@mdi/js';
-import { listObjects } from "../utils/helpers.ts";
-import { useEffect, useMemo, useState } from "react";
-import PdfAccordian from "./PdfAccordian.tsx";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-
+ 
 
 export default function CustomAssetManagerPdf({close}) {
   const [assets, setAssets] = useState([])
@@ -23,19 +18,6 @@ export default function CustomAssetManagerPdf({close}) {
   const editor = useEditor();
   const [isLoading, setIsLoading] = useState(false)
 
-
-
-
-
-
-  const remove = (asset: Asset) => {
-    editor.Assets.remove(asset);
-  };
-
-  const parseUrl = (url: string) => {
-    const path = new URL(url).pathname;
-    return path.substring(1, path.lastIndexOf('/'));
-  };
 
 
 
@@ -49,6 +31,8 @@ export default function CustomAssetManagerPdf({close}) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('s3_id', user._id + ":" + file.name.replace("-",""));
+      formData.append('company', user.company );
+      formData.append('user_id', user._id );
 
       let apiUrl;
       const fileType = file.type;
@@ -71,7 +55,7 @@ export default function CustomAssetManagerPdf({close}) {
           },
         });
 
-        const fileUrl = response.data.url;
+        const fileUrl = response.data.url+"~"+response.data.session_id;
         setSnackbarMessage("Uploaded. Successfully...");
         setSnackbarSeverity('success');
         setSnackbarOpen(true);

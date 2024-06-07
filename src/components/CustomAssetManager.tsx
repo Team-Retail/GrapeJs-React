@@ -7,7 +7,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/base.ts";
 const saveJsonApiUrl = BASE_URL + "/api/auth/upload";
 import { mdiCloudUploadOutline } from '@mdi/js';
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export type CustomAssetManagerProps = Pick<
   AssetsResultProps,
@@ -18,6 +18,7 @@ export default function CustomAssetManager({
   assets,
   select,
 }: CustomAssetManagerProps) {
+  const [count, setCount] = useState(0)
   const editor = useEditor();
 
   const remove = (asset: Asset) => {
@@ -26,14 +27,14 @@ export default function CustomAssetManager({
 
   const addAsset = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    const saveJsonApiUrl = "http://54.227.212.214:5000/upload";
+    const saveJsonApiUrl = BASE_URL +"/api/auth/upload";
     const user = JSON.parse(localStorage.getItem("userDetails"));
     if (files && files.length > 0) {
       const file = files[0];
       const formData = new FormData();
       formData.append('file', file);
-      // formData.append('fieldName', user.companyName + "_" + user.email);
-      formData.append('s3_id', user._id);
+      formData.append('fieldName', user.companyName + "/" + user._id+"/images");
+      // formData.append('s3_id', user._id);
 
 
       try {
@@ -45,14 +46,26 @@ export default function CustomAssetManager({
 
         const imageUrl = response.data.url;
         editor.Assets.add({ src: imageUrl });
+        setCount(count + 1);  
       } catch (error) {
         console.error('Error uploading image:', error);
       }
     }
   };
+  const isImage = (src) => {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    const ext = src.split('.').pop().toLowerCase();
+    return imageExtensions.includes(ext);
+  };
+
   const imgAssets = useMemo(() => {
-    return assets.filter(a => !a.get('src').includes("ai-processed-pdf"))
-  }, [assets])
+    return assets.filter(a => {
+      const src = a.get('src');
+      return  isImage(src);
+    });
+  }, [count]);
+
+  console.log(assets,imgAssets)
 
   return (
     <div className=" flex flex-col gap-4 max-h-[60vh] overflow-y-scroll scrollbar-thin bg-white  ">
@@ -96,7 +109,7 @@ export default function CustomAssetManager({
             </div>
           </div>
         ))}
-   
+
       </div>
 
     </div>

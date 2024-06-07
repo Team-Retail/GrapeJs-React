@@ -123,7 +123,7 @@ export default function CompanyDetails() {
   const handleFileUpload = async () => {
     setIsLoading(true);
     const user: User = JSON.parse(localStorage.getItem('userDetails'))
-    const usernameFolder = user.companyName + "_" + user.email
+    const usernameFolder = user.companyName + "/" + user._id
 
     const uploadPromises = [];
 
@@ -150,7 +150,6 @@ export default function CompanyDetails() {
         }),
       );
     }
-
     if (businessCardBack && businessCardBack.length > 0) {
       const backKey = `${usernameFolder}/businessCardBack-${ref.current}-${businessCardBack[0].name}`;
       uploadPromises.push(
@@ -163,7 +162,6 @@ export default function CompanyDetails() {
       );
     }
     await Promise.all(uploadPromises);
-
     setIsLoading(false);
   };
 
