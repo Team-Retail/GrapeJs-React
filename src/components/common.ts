@@ -1,4 +1,4 @@
-export const MAIN_BG_COLOR = "black";
+export const MAIN_BG_COLOR = "bg-white";
 
 export const MAIN_TXT_COLOR = "text-black";
 

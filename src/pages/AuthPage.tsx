@@ -29,7 +29,7 @@ export default function AuthPage() {
     }));
   };
 
-  
+
 
   const URL = BASE_URL + "/api/auth";
 
@@ -60,10 +60,10 @@ export default function AuthPage() {
         setSnackbarMessage("User logedIn.");
         setSnackbarSeverity('success');
         resetForm();
-        if(res.data.hasSocial){
+        if (res.data.hasSocial) {
           navigate("/editor")
         }
-        else{
+        else {
           navigate("/company")
         }
       }
@@ -73,7 +73,7 @@ export default function AuthPage() {
       }
       setSnackbarOpen(true);
 
-   
+
     } catch (error) {
       setSnackbarMessage("Sign In Error: " + error.response.data.message);
       setSnackbarSeverity('error');
