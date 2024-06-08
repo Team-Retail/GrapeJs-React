@@ -148,9 +148,9 @@ export default function AuthPage() {
 
 
         <div className="flex flex-col ">
-          <h1 className="text-4xl text-white font-mono font-thin leading-none">{!signIn ? "New User?" : "Already a user?"}</h1>
+          <h1 className="text-4xl text-white font-mono font-thin leading-none">{signIn ? "New User?" : "Already a user?"}</h1>
           <p className="text-white text-sm">
-            {!signIn ? "Sign Up & start Customising!" : "Sign in & start Customising!"}
+            {signIn ? "Sign Up & start Customising!" : "Sign in & start Customising!"}
           </p>
 
           <button

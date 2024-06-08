@@ -13,6 +13,12 @@ import PdfAccordion from './PdfAccordian.tsx';
 
 const saveEditorJsonApiUrl = BASE_URL + "/api/auth/save-json";
 
+const isImage = (src) => {
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+  const ext = src.split('.').pop().toLowerCase();
+  return imageExtensions.includes(ext);
+};
+
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
@@ -49,17 +55,20 @@ const SidebarTabComponent = () => {
     editor.on('asset', (args) => {
       if (args.event === "update") {
         setAssets(args.model.models);
-        setValue(1);
 
         const updatedAsset = args.model.models.find(asset => {
           return !assets.some(existingAsset => existingAsset.cid === asset.cid);
         });
 
         if (updatedAsset) {
+          if(isImage(updatedAsset.get("src"))){
+            return;
+          }
+          setValue(1);
           setExpandedAccordion(updatedAsset.cid);
+          saveData();
         }
 
-        saveData();
       }
       if (args.event === "reset") {
         setAssets(args.model.models);
@@ -68,7 +77,7 @@ const SidebarTabComponent = () => {
   }, [editor, assets]);
 
   const pdfAssets = useMemo(() => {
-    return assets;
+    return assets.filter(a => !isImage(a.get('src')));
   }, [assets]);
 
 

@@ -4,7 +4,6 @@ import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 const REGION = import.meta.env.VITE_APP_AWS_REGION; // e.g., "us-west-2"
 const BUCKET_NAME = import.meta.env.VITE_APP_AWS_BUCKET_NAME;
 
-
 const listObjects = async (prefix) => {
   const s3Client = new S3Client({
     region: import.meta.env.VITE_APP_AWS_REGION,
@@ -21,4 +20,9 @@ const listObjects = async (prefix) => {
   return response.Contents;
 };
 
+export const isImage = (src) => {
+  const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+  const ext = src.split(".").pop().toLowerCase();
+  return imageExtensions.includes(ext);
+};
 export { listObjects };
