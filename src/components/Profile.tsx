@@ -15,7 +15,7 @@ export default function Profile() {
   };
   function editDetails() {
 
-  }
+}
   const handleClose = () => {
     setAnchorEl(null);
   };
