@@ -70,6 +70,8 @@ const loadData = async () => {
 };
 
 
+
+
 const gjsOptions = {
   height: "100vh",
   storageManager: {
@@ -77,6 +79,7 @@ const gjsOptions = {
   },
   undoManager: { trackSelection: false },
   selectorManager: { componentFirst: true ,
+   
   },
   styleManager: {
     sectors: [{
@@ -301,6 +304,7 @@ export default function GrapeJSPage() {
     // Load initial data
     const initialData = await loadData();
     editor.loadProjectData(initialData);
+    
   };
 
   const handleTemplateChange = async (template) => {

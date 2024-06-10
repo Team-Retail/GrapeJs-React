@@ -7,7 +7,7 @@ import pdficon from "../assets/pdficon.png";
 import clipboard from "../assets/clipboard.png";
 
 import Icon from '@mdi/react';
-import { mdiChevronDown, mdiLoading,  } from '@mdi/js';
+import { mdiChevronDown, mdiLoading, } from '@mdi/js';
 import { listObjects } from '../utils/helpers';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -20,7 +20,7 @@ import axios from 'axios';
 import { BASE_URL, BASE_URL_PYTHON } from '../utils/base';
 
 
-const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
+const UploadedAssestsAccordian = ({ item, expanded, onChange, select }) => {
   const [group, setGroup] = useState<GroupedImages>({ images: {}, icons: {}, color_palette: {}, full_text: {}, sub_text: {} });
   const [selectedPage, setSelectedPage] = useState<string | number>('1');
   const [loading, setLoading] = useState(true);
@@ -181,38 +181,17 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
     setLoading(false);
   };
 
-  const handleGetStatus = async () => {
-    const session = url[1]
-    const resp = await axios.get(BASE_URL_PYTHON + "/session_status/" + session)
-    if (resp.data.failed === true) {
-      setStatus('failed');
-      clearInterval(intervalRef.current);
-    } else if (resp.data.completed === true) {
-      setStatus('completed');
-      clearInterval(intervalRef.current);
-    } else {
-      setStatus('processing');
-      setFeature(resp.data.upload_count);
-    }
-    console.log("status", resp.data);
 
-  }
+
+
 
 
 
   useEffect(() => {
-     handleGetStatus();
-    intervalRef.current = setInterval(async () => {
-      await handleGetStatus();
-    }, 10000); 
-    return () => clearInterval(intervalRef.current); // Cleanup interval on unmount
+    setStatus("completed")
+    handleUploadTest();
+
   }, []);
-
-  useEffect(() => {
-    if (status === 'completed') {
-      handleUploadTest();
-    }
-  }, [status]);
 
 
   const handlePageChange = (event) => {
@@ -232,26 +211,26 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
   };
 
 
-  if(status==="failed") return <></>
-  if(status==="processing") return (
+  if (status === "failed") return <></>
+  if (status === "processing") return (
     <div className="w-full flex flex-col gap-1 p-2 bg-[#B5DFFF] !bg-opacity-30 rounded-md shadow-md">
       <Typography className='flex gap-1'>
         <img src={pdficon} alt="" className='w-7 h-7' />
         {getFileName()}
       </Typography>
       <div className="flex gap-3 items-center ">
-        <Icon path={mdiLoading } size={1} className={ "animate-spin text-blue-500"} />
+        <Icon path={mdiLoading} size={1} className={"animate-spin text-blue-500"} />
         <p className='text-xs font-manrope text-gray-500 font-semibol'>
 
-        {feature} Features Extracted
+          {feature} Features Extracted
         </p>
 
       </div>
     </div>
   )
 
-  if(status==="fetching"){
-    return(<Skeleton sx={{ bgcolor: "#B5DFFF" }} className='w-full' animation="wave" variant="rounded"  height={60} />)
+  if (status === "fetching") {
+    return (<Skeleton sx={{ bgcolor: "#B5DFFF" }} className='w-full' animation="wave" variant="rounded" height={60} />)
   }
 
   return (
@@ -314,6 +293,7 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
                     key={image.url}
                     src={image.url}
                     alt={`Page ${selectedPage} Image ${index}`}
+                    select={select}
                     className="w-28 h-28 rounded-lg mb-4 shadow-lg"
                     draggable
                     onDragStart={(event) => handleDragStart(event, image)}
@@ -342,9 +322,11 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
                   <SuspenseImage
                     key={image.url}
                     src={image.url}
+                    select={select}
+
                     alt={`Page ${selectedPage} Icon ${index}`}
                     className="w-[72px] h-[72px] rounded-lg mb-4 shadow-lg"
-                    
+
                   />
                 ))}
               </div>
@@ -354,9 +336,9 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
           </>
 
 
-          
 
-         
+
+
 
 
         </div>
@@ -368,7 +350,7 @@ const UploadedAssestsAccordian = ({ item, expanded, onChange }) => {
 export default UploadedAssestsAccordian;
 
 // TODO:reapeated component
-const SuspenseImage = ({ src, alt, ...props }) => {
+const SuspenseImage = ({ src, alt, select, ...props }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -377,14 +359,21 @@ const SuspenseImage = ({ src, alt, ...props }) => {
 
   return (
     <Suspense fallback={<Skeleton sx={{ bgcolor: "#eff8ff" }} animation="wave" variant="rounded" width={112} height={112} {...props} />}>
-      <LazyImage
-        src={src}
-        alt={alt}
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
-        style={{ display: loading ? 'none' : 'block' }}
-        {...props}
-      />
+      <div className="w-fit h-fit relative group ">
+
+        <LazyImage
+          src={src}
+          alt={alt}
+          onLoad={() => setLoading(false)}
+          onError={() => setLoading(false)}
+          style={{ display: loading ? 'none' : 'block' }}
+
+          {...props}
+        />
+        <button onClick={() => select(src)} className="absolute p-1  bg-white rounded-lg text-blue-500 text-xs bottom-6 box-border inset-x-2 group-hover:block hidden">
+          Select
+        </button>
+      </div>
     </Suspense>
   );
 };
