@@ -9,7 +9,6 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import type { Trait } from "grapesjs";
 import { ROUND_BORDER_COLOR, cx } from "./common.ts";
-
 interface StylePropertyFieldProps extends React.HTMLProps<HTMLDivElement> {
   trait: Trait;
 }
@@ -50,7 +49,6 @@ export default function TraitPropertyField({
       fullWidth
     />
   );
-
   switch (type) {
     case "select":
       {
@@ -121,7 +119,6 @@ export default function TraitPropertyField({
       }
       break;
   }
-
   return (
     <div {...rest} className={cx("mb-3 px-1 w-full")}>
       <div className={cx("flex mb-2 items-center")}>

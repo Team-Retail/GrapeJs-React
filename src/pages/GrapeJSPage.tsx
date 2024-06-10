@@ -70,7 +70,9 @@ const loadData = async () => {
 };
 
 
+
 const gjsOptions = {
+
   height: "100vh",
   storageManager: {
     type: 'remote',
@@ -194,7 +196,34 @@ const gjsOptions = {
       open: false,
       buildProps: ['transition', 'perspective', 'transform'],
     }]
-  }
+  },
+  toolbar:[
+    [
+      {
+        "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z\" /></svg>"
+      },
+      {
+        "attributes": {
+          "class": "gjs-no-touch-actions",
+          "draggable": true
+        },
+        "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z\"/></svg>",
+        "command": "tlb-move"
+      },
+      {
+        "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z\" /></svg>",
+        "command": "tlb-delete"
+      },
+      {
+        "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z\" /></svg>",
+        "command": "tlb-delete"
+      },
+      {
+        "label": "D",
+        "command": "tlb-delete"
+      }
+    ]
+  ]
 };
 
 const tailwindClasses = [
@@ -259,6 +288,7 @@ const editorPlugins = (editor) => {
 };
 
 export default function GrapeJSPage() {
+
   const [activeTab, setActiveTab] = React.useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = React.useState<string>('Template1');
   const navigate = useNavigate()
@@ -284,6 +314,54 @@ export default function GrapeJSPage() {
     console.log("Editor loaded");
     // @ts-ignore
     window.editor = editor;
+    editor.Components.getTypes().map(type => {
+      editor.Components.addType(type.id, {
+        model: {
+          defaults: {
+
+            traits:[
+              ...editor.Components.getType(type.id).model.prototype.defaults.traits,
+              ...[
+              ]
+            ],
+            toolbar:[
+
+                {
+                  "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z\" /></svg>"
+                },
+                {
+                  "attributes": {
+                    "class": "gjs-no-touch-actions bg-custom-white",
+                    "draggable": true
+                  },
+                  "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z\"/></svg>",
+                  "command": "tlb-move"
+                },
+                {
+                  "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z\" /></svg>",
+                  "command": "tlb-clone"
+                },
+                {
+                  "label": "<svg viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z\" /></svg>",
+                  "command": "tlb-delete"
+                },
+                {
+                  "label": "<div class=\"flex flex-row items-center justify-start gap-[4px]\">\n" +
+                    "        <img\n" +
+                    "          class=\"w-5 relative h-5 overflow-hidden shrink-0\"\n" +
+                    "          alt=\"\"\n" +
+                    "          src=\"/src/assets/eaasai-logo.svg\"\n" +
+                    "        />\n" +
+                    "        <div class=\"relative font-semibold text-transparent !bg-clip-text [background:linear-gradient(90deg,_#1d85e6,_#56a6e2)] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]\">\n" +
+                    "          Generate\n" +
+                    "        </div>\n" +
+                    "      </div> ",
+                  "command": "tlb-delete"
+                }]
+          },
+        }
+      })
+    });
     editorPlugins(editor);
 
     editor.Storage.add('remote', {
