@@ -1,7 +1,7 @@
 import GjsEditor, {
   AssetsProvider,
   Canvas,
-  ModalProvider,
+  ModalProvider, useEditor
 } from "@grapesjs/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import axios from 'axios';
@@ -11,13 +11,37 @@ import CustomAssetManager from "../components/CustomAssetManager.tsx";
 import CustomModal from "../components/CustomModal.tsx";
 import SidebarContent from "../components/SidebarContent.tsx";
 import Topbar from "../components/Topbar.tsx";
-import { MAIN_BORDER_COLOR } from "../components/common.ts";
+import { cx, MAIN_BG_COLOR, MAIN_BORDER_COLOR } from "../components/common.ts";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Template1, Template2 } from "../utils/template.ts";
 import { BASE_URL } from "../utils/base.ts";
 import { useNavigate } from "react-router-dom";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import CustomAssetManagerPdf from "../components/CustomAssetManagerPdf.tsx";
+import googleai from "../assets/googleai.png";
+import Icon from "@mdi/react";
+import { mdiCloseCircleOutline } from "@mdi/js";
+import Fade from "@mui/material/Fade";
+
 // import 'slick-carousel/slick/slick.min.js';
+const style = {
+  position: 'absolute' ,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 500,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const theme = createTheme({
   palette: {
@@ -290,6 +314,9 @@ const editorPlugins = (editor) => {
 
 export default function GrapeJSPage() {
 
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const [activeTab, setActiveTab] = React.useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = React.useState<string>('Template1');
   const navigate = useNavigate()
@@ -315,6 +342,11 @@ export default function GrapeJSPage() {
     console.log("Editor loaded");
     // @ts-ignore
     window.editor = editor;
+    editor.Commands.add('open-modal', {
+      run(editor) {
+        handleOpen();
+      }
+    });
 
     editor.Components.getTypes().map(type => {
       editor.Components.addType(type.id, {
@@ -358,7 +390,7 @@ export default function GrapeJSPage() {
                   "          Generate\n" +
                   "        </div>\n" +
                   "      </div> ",
-                "command": "tlb-delete"
+                "command": "open-modal"
               }]
           },
         }
@@ -396,6 +428,48 @@ export default function GrapeJSPage() {
 
   return (
     <ThemeProvider theme={theme}>
+      <Button onClick={handleOpen}>Open modal</Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Fade in={open}>
+          <Box
+            sx={style}
+            className={cx(MAIN_BG_COLOR, "rounded-xl !border-none w-full max-w-[500px]")}
+          >
+            <div className="flex w-full   pb-3">
+              <div className="flex w-full justify-between">
+
+                <div className="flex gap-2 items-center text-xl font-semibold font-manrope">
+                  <img src={googleai} alt="" className="w-10 h-10" />
+                  <span>
+                   <div className="relative font-medium">Generate Image</div>
+              <div className="relative text-[11.8px] font-medium text-darkgray">
+                Write the prompt and get the desired image.
+              </div>
+                </span>
+                </div>
+                <div onClick={handleClose} className="cursor-pointer my-auto">
+                  <Icon path={mdiCloseCircleOutline} size={1} />
+
+                </div>
+              </div>
+            </div>
+
+          </Box>
+        </Fade>
+      </Modal>
+      {/*<CustomModal*/}
+      {/*  open={open}*/}
+      {/*  title={"Generate Image"}*/}
+      {/*  close={handleClose}*/}
+      {/*><CustomAssetManagerPdf*/}
+      {/*  close={handleClose}*/}
+
+      {/*/></CustomModal>*/}
       <GjsEditor
         className="gjs-custom-editor text-white  bg-white"
         grapesjs="https://unpkg.com/grapesjs"
