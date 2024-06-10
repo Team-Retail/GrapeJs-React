@@ -14,11 +14,15 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Select from "../components/Select.tsx";
 import backImg from "../assets/backImg.png"
+import Icon from '@mdi/react';
+import { mdiLoading, mdiCloudUploadOutline } from '@mdi/js';
 
 const getJsonApiUrl = BASE_URL + "/api/auth/get-json/";
 import useTimeout from "../utils/useTimeout.ts";
 
 export default function EditDetails() {
+  const [loading, setLoading] = useState(false)
+
   const getDefaultEntry = async () => {
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
     const userDetailsResponse = await axios.get(BASE_URL+`/api/auth/detailsById/${userId}`)
@@ -234,6 +238,8 @@ export default function EditDetails() {
   };
 
   const submitForm = async () => {
+    setLoading(true);
+
     await handleFileUpload();
     console.log(formData);
     const user = JSON.parse(localStorage.getItem("userDetails") || "{}");
@@ -271,6 +277,8 @@ export default function EditDetails() {
     } catch (error) {
       console.error("Error saving company data:", error);
     }
+    setLoading(true);
+
   };
 
   const clearForm = () => {
@@ -458,8 +466,10 @@ export default function EditDetails() {
                 </div>
                 <div className={"flex items-center justify-center"}>
                   <StepperNext>
-                    <button onClick={submitForm}
-                            className=" px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px]">
+                    <button onClick={submitForm} 
+                      disabled={loading }
+                      className=" px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px] disabled:opacity-70">
+                      {loading && <Icon path={mdiLoading} size={1} className={loading ? "animate-spin" : ""} />}
                       Save & Continue
                     </button>
                   </StepperNext>

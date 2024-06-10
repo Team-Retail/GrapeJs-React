@@ -7,7 +7,7 @@ import pdficon from "../assets/pdficon.png";
 import clipboard from "../assets/clipboard.png";
 
 import Icon from '@mdi/react';
-import { mdiChevronDown, mdiLoading,  } from '@mdi/js';
+import { mdiChevronDown, mdiLoading, } from '@mdi/js';
 import { listObjects } from '../utils/helpers';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -18,10 +18,9 @@ import ColorPalette from './ColorPalette';
 import { GroupedImages } from '../utils/types';
 import axios from 'axios';
 import { BASE_URL, BASE_URL_PYTHON } from '../utils/base';
-import { toast } from 'sonner';
 
 
-const PdfAccordion = ({ item, expanded, onChange,processing }) => {
+const UploadedAssestsAccordian = ({ item, expanded, onChange, select }) => {
   const [group, setGroup] = useState<GroupedImages>({ images: {}, icons: {}, color_palette: {}, full_text: {}, sub_text: {} });
   const [selectedPage, setSelectedPage] = useState<string | number>('1');
   const [loading, setLoading] = useState(true);
@@ -182,53 +181,17 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
     setLoading(false);
   };
 
-  // const handleGetStatus = async () => {
-  //   const session = url[1]
-  //   const resp = await axios.get(BASE_URL_PYTHON + "/session_status/" + session)
-  //   if (resp.data.failed === true) {
-  //     setStatus('failed');
-  //     clearInterval(intervalRef.current);
-  //   } else if (resp.data.completed === true) {
-  //     setStatus('completed');
-  //     clearInterval(intervalRef.current);
-  //   } else {
-  //     setStatus('processing');
-  //     setFeature(resp.data.upload_count);
-  //   }
-  //   console.log("status", resp.data);
 
-  // }
+
+
 
 
 
   useEffect(() => {
-    const session = processing.find(session => session.session_id === url[1]);
-    if(processing===null){
-      setStatus("fetching")
-    }
-    else if(session && !session.completed){
-      setStatus("processing")
-      setFeature(session.upload_count)
-    }
-    else{
-      setStatus("completed")
-    }
-    
-    // if (session) {
-    //   setStatus("processing");
-    // } else if (!bool) {
-    //   setStatus("fetching")
-    // } else {
-    //   setStatus("completed")
-    // }
-  }, [processing]);
-  console.log("processing se", processing, url,item.cid)
+    setStatus("completed")
+    handleUploadTest();
 
-  useEffect(() => {
-    if (status === 'completed') {
-      handleUploadTest();
-    }
-  }, [status]);
+  }, []);
 
 
   const handlePageChange = (event) => {
@@ -247,35 +210,27 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
     return splitItemUrl[2].split("-")[0];
   };
 
-  const handleCopy = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success('Text copied to clipboard!');
-    } catch (error) {
-      toast.error('Failed to copy text to clipboard.');
-    }
-  };
 
-  if(status==="failed") return <></>
-  if(status==="processing") return (
+  if (status === "failed") return <></>
+  if (status === "processing") return (
     <div className="w-full flex flex-col gap-1 p-2 bg-[#B5DFFF] !bg-opacity-30 rounded-md shadow-md">
       <Typography className='flex gap-1'>
         <img src={pdficon} alt="" className='w-7 h-7' />
         {getFileName()}
       </Typography>
       <div className="flex gap-3 items-center ">
-        <Icon path={mdiLoading } size={1} className={ "animate-spin text-blue-500"} />
+        <Icon path={mdiLoading} size={1} className={"animate-spin text-blue-500"} />
         <p className='text-xs font-manrope text-gray-500 font-semibol'>
 
-        {feature} Features Extracted
+          {feature} Features Extracted
         </p>
 
       </div>
     </div>
   )
 
-  if(status==="fetching"){
-    return(<Skeleton sx={{ bgcolor: "#B5DFFF" }} className='w-full' animation="wave" variant="rounded"  height={60} />)
+  if (status === "fetching") {
+    return (<Skeleton sx={{ bgcolor: "#B5DFFF" }} className='w-full' animation="wave" variant="rounded" height={60} />)
   }
 
   return (
@@ -338,6 +293,7 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
                     key={image.url}
                     src={image.url}
                     alt={`Page ${selectedPage} Image ${index}`}
+                    select={select}
                     className="w-28 h-28 rounded-lg mb-4 shadow-lg"
                     draggable
                     onDragStart={(event) => handleDragStart(event, image)}
@@ -366,10 +322,11 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
                   <SuspenseImage
                     key={image.url}
                     src={image.url}
+                    select={select}
+
                     alt={`Page ${selectedPage} Icon ${index}`}
                     className="w-[72px] h-[72px] rounded-lg mb-4 shadow-lg"
-                    draggable
-                    onDragStart={(event) => handleDragStart(event, image)}
+
                   />
                 ))}
               </div>
@@ -379,67 +336,9 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
           </>
 
 
-          <>
-            <div className="flex border-b py-2 justify-between">
-              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'> Text Components</h1>
-              {group.full_text[selectedPage]?.length > 0 && group.full_text[selectedPage][0]?.url?.length > 0 && (<button onClick={() => {
-                handleCopy(group.full_text[selectedPage][0]?.url)
-              }} className="my-auto outline-none border-none bg-transparent">
-                <img src={clipboard} alt="" className='w-5 h-5' />
-              </button>)}
-            </div>
-            {loading ? (
-              <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-                <Skeleton sx={{ bgcolor: "#B5DFFF" }} animation="wave" variant="rounded" className='w-full h-5' />
-              </div>
-            ) : group.full_text[selectedPage]?.length > 0 && group.full_text[selectedPage][0]?.url?.length > 0 ? (
-              <p className="mt-4 flex flex-col gap-2 leading-5 px-2 text-justify h-full max-h-[300px] min-h-[200px]  text-xs overflow-y-scroll scrollbar-thin   ">
-                {group.sub_text[selectedPage].map((item, index) => (
-                  <span onClick={() => {
-                    handleCopy(item.url)
-                  }} key={index} className="relative  p-2 border border-gray-200 rounded-sm   h-fit  text-left w-full hover:bg-sky-500/20  bg-sky-100/70 text-gray-700 cursor-pointer hover:text-black">
-                    {/* <button onClick={()=>{
-                        handleCopy(item.url)
-                    }} className="absolute right-1 top-1 outline-none border-none bg-transparent">
-                      <img src={clipboard} alt="" className='w-5 h-5' />
-                    </button> */}
-                    {item.url}
-                  </span>
-                ))}
-              </p>
-            ) : (
-              <p className="mt-4 text-center text-gray-500 h-[40px] flex justify-center items-center">No  text found</p>
-            )}
-          </>
 
-          <>
 
-            <div className="flex border-b py-2 justify-between">
-              <h1 className='text-xs text-gray-500 font-manrope font-bold my-auto'>Color Palette</h1>
-            </div>
-            {loading ? (
-              <div className="mt-4 flex flex-wrap h-[50px] scrollbar-thin overflow-y-scroll items-center justify-center gap-2">
-                <Skeleton sx={{ bgcolor: "#B5DFFF" }} animation="wave" variant="rounded" className='w-full h-5' />
-              </div>
-            ) : group.color_palette[selectedPage]?.length > 0 ? (
-              <div className="mt-4 flex h-auto items-center justify-center gap-2">
-                {group.color_palette[selectedPage].map((item, index) => (
-                  item.url.startsWith('#') ? (
-                    <ColorPalette key={index} hexValues={item.url.split('\n')} />
-                  ) : (
-                    <SuspenseImage
-                      key={item.url}
-                      src={item.url}
-                      alt={`Page ${selectedPage} Color Palette ${index}`}
-                      className="w-20 h-20 rounded-lg mb-4"
-                    />
-                  )
-                ))}
-              </div>
-            ) : (
-              <p className="mt-4 text-center text-gray-500 h-[100px] flex justify-center items-center">No color palette found</p>
-            )}
-          </>
+
 
 
         </div>
@@ -448,9 +347,10 @@ const PdfAccordion = ({ item, expanded, onChange,processing }) => {
   );
 };
 
-export default PdfAccordion;
+export default UploadedAssestsAccordian;
 
-const SuspenseImage = ({ src, alt, ...props }) => {
+// TODO:reapeated component
+const SuspenseImage = ({ src, alt, select, ...props }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -459,14 +359,21 @@ const SuspenseImage = ({ src, alt, ...props }) => {
 
   return (
     <Suspense fallback={<Skeleton sx={{ bgcolor: "#eff8ff" }} animation="wave" variant="rounded" width={112} height={112} {...props} />}>
-      <LazyImage
-        src={src}
-        alt={alt}
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
-        style={{ display: loading ? 'none' : 'block' }}
-        {...props}
-      />
+      <div className="w-fit h-fit relative group ">
+
+        <LazyImage
+          src={src}
+          alt={alt}
+          onLoad={() => setLoading(false)}
+          onError={() => setLoading(false)}
+          style={{ display: loading ? 'none' : 'block' }}
+
+          {...props}
+        />
+        <button onClick={() => select(src)} className="absolute p-1  bg-white rounded-lg text-blue-500 text-xs bottom-6 box-border inset-x-2 group-hover:block hidden">
+          Select
+        </button>
+      </div>
     </Suspense>
   );
 };

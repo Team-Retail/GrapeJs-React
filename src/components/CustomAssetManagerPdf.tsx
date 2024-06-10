@@ -31,7 +31,7 @@ export default function CustomAssetManagerPdf({close}) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('s3_id', user._id + ":" + file.name.replace("-",""));
-      formData.append('company', user.company );
+      formData.append('company', user.companyName );
       formData.append('user_id', user._id );
 
       let apiUrl;

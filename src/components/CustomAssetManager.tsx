@@ -8,6 +8,13 @@ import { BASE_URL } from "../utils/base.ts";
 const saveJsonApiUrl = BASE_URL + "/api/auth/upload";
 import { mdiCloudUploadOutline } from '@mdi/js';
 import { useMemo, useState } from "react";
+import UploadedImageAssets from "./UploadedImageAssets.tsx";
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import UploadedAssestsAccordian from "./UploadedAssestsAccordian.tsx";
+import { useStepContext } from "@mui/material";
 
 export type CustomAssetManagerProps = Pick<
   AssetsResultProps,
@@ -19,6 +26,9 @@ export default function CustomAssetManager({
   select,
 }: CustomAssetManagerProps) {
   const [count, setCount] = useState(0)
+  const [value, setValue] = useState(0);
+  const [expanded, setExpanded] = useState<string>()
+
   const editor = useEditor();
 
   const remove = (asset: Asset) => {
@@ -27,14 +37,13 @@ export default function CustomAssetManager({
 
   const addAsset = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    const saveJsonApiUrl = BASE_URL +"/api/auth/upload";
+    const saveJsonApiUrl = BASE_URL + "/api/auth/upload";
     const user = JSON.parse(localStorage.getItem("userDetails"));
     if (files && files.length > 0) {
       const file = files[0];
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('fieldName', user.companyName + "/" + user._id+"/images");
-      // formData.append('s3_id', user._id);
+      formData.append('fieldName', user.companyName + "/" + user._id + "/images");
 
 
       try {
@@ -46,7 +55,7 @@ export default function CustomAssetManager({
 
         const imageUrl = response.data.url;
         editor.Assets.add({ src: imageUrl });
-        setCount(count + 1);  
+        setCount(count + 1);
       } catch (error) {
         console.error('Error uploading image:', error);
       }
@@ -61,11 +70,27 @@ export default function CustomAssetManager({
   const imgAssets = useMemo(() => {
     return assets.filter(a => {
       const src = a.get('src');
-      return  isImage(src);
+      return isImage(src);
     });
-  }, [count]);
+  }, [count, assets]);
+  const otherAssets = useMemo(() => {
+    return assets.filter(a => {
+      const src = a.get('src');
+      return !isImage(src);
+    });
+  }, [count, assets]);
 
-  console.log(assets,imgAssets)
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    };
+  }
+
+  console.log("kk", otherAssets, expanded)
 
   return (
     <div className=" flex flex-col gap-4 max-h-[60vh] overflow-y-scroll scrollbar-thin bg-white  ">
@@ -83,34 +108,50 @@ export default function CustomAssetManager({
         </div>
 
       </div>
-      <div className="flex items-center justify-center gap-4 flex-wrap">
 
-        {imgAssets.map((asset) => (
-          <div
-            key={asset.getSrc()}
-            className="relative group rounded w-fit overflow-hidden"
-          >
-            <img className="w-48 h-48" src={asset.getSrc()} />
-            <div className="flex flex-col items-center justify-end absolute top-0 left-0 w-full h-full p-5 bg-zinc-700/75 group-hover:opacity-100 opacity-0 transition-opacity">
-              <button
-                type="button"
-                className={BTN_CLS}
-                onClick={() => select(asset, true)}
-              >
-                Select
-              </button>
-              <button
-                type="button"
-                className="absolute top-2 right-2"
-                onClick={() => remove(asset)}
-              >
-                <Icon size={1} path={mdiClose} />
-              </button>
-            </div>
-          </div>
-        ))}
 
-      </div>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tab
+            label="Images"
+            {...a11yProps(0)}
+            sx={{
+              background: value === 0 ? 'linear-gradient(to right, #1D85E6, #81C0F7)' : '#6C6C6C',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          />
+          <Tab
+            label="Components"
+            {...a11yProps(1)}
+            sx={{
+              background: value === 1 ? 'linear-gradient(to right, #1D85E6, #81C0F7)' : '#6C6C6C',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          />
+        </Tabs>
+      </Box>
+
+
+      {value === 0 ? (
+        <UploadedImageAssets assets={imgAssets} select={select} close={close} />
+
+      ) : (
+        <div className="flex flex-col gap-3">
+          {otherAssets.map(asset => {
+            console.log(asset)
+            return (
+
+              <UploadedAssestsAccordian expanded={asset.cid === expanded} item={asset} onChange={() => {
+                console.log("hello world", asset);
+                setExpanded(asset.cid)
+              }} key={asset.cid} select={select} />
+            )
+          })}
+        </div>
+      )}
+
 
     </div>
   );

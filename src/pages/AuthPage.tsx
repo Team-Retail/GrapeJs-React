@@ -1,16 +1,19 @@
 import axios from "axios";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/base";
 import whitelogo from "../assets/logowhite.png"
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Icon from '@mdi/react';
+import { mdiLoading, mdiCloudUploadOutline } from '@mdi/js';
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -29,12 +32,32 @@ export default function AuthPage() {
     }));
   };
 
+  useEffect(() => {
+    userFunc()
+
+  }, [])
+
+  const userFunc = () => {
+    const user = JSON.parse(localStorage.getItem("userDetails"))
+    console.log("user", user)
+    if (user) {
+      if (!user?.hasSocial) {
+        navigate("/company")
+  
+      }
+      navigate("/editor")
+    }
+    // @ts-ignore
+  }
+
 
 
   const URL = BASE_URL + "/api/auth";
 
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+
     const signInData = {
       email: formData.email_id,
       password: formData.password,
@@ -80,10 +103,16 @@ export default function AuthPage() {
       setSnackbarOpen(true);
       console.error("Sign In Error:", error, error.response.data.message);
     }
+    finally{
+      setLoading(false);
+
+    }
   };
 
   const handleSignUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+
     const signUpData = {
       firstName: formData.first_name,
       lastName: formData.last_name,
@@ -113,6 +142,9 @@ export default function AuthPage() {
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       console.error("Sign Up Error:", error);
+    } finally {
+      setLoading(false);
+
     }
   };
 
@@ -207,10 +239,12 @@ export default function AuthPage() {
               </div>
               <div className="flex items-center justify-between ">
                 <button
-                  className="bg-[#1A72D3] hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                  className="bg-[#1A72D3] hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full flex items-center justify-center disabled:opacity-70"
                   type="submit"
+                  disabled={loading}
                 >
-                  Login
+                  {loading&&<Icon path={mdiLoading } size={1} className={loading ? "animate-spin" : ""} />}
+                  {loading ? 'Logging in...' : 'Login'}
                 </button>
               </div>
             </form>
@@ -305,12 +339,15 @@ export default function AuthPage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-                  type="submit"
-                >
-                  Sign Up
-                </button>
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-normal py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full flex items-center justify-center disabled:opacity-70"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading && <Icon path={mdiLoading} size={1} className={loading ? "animate-spin" : ""} />}
+
+                    {loading ? 'Signing up...' : 'Sign Up'}
+                  </button>
               </div>
             </form>
             <p className="text-xs mt-5 text-center text-[#6B6B6B] font-semibold">

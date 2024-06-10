@@ -78,7 +78,8 @@ const gjsOptions = {
     type: 'remote',
   },
   undoManager: { trackSelection: false },
-  selectorManager: { componentFirst: true },
+  selectorManager: { componentFirst: true ,
+  },
   styleManager: {
     sectors: [{
       name: 'General',
