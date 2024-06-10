@@ -63,7 +63,10 @@ export default function RightSidebar({
         )} */}
         <>
           <SelectorsProvider>
-            {(props) => <CustomSelectorManager {...props} />}
+            {(props) => {
+              console.log("selector props",props)
+              return (<CustomSelectorManager {...props} />)
+            }}
           </SelectorsProvider>
           <StylesProvider>
             {(props) => <CustomStyleManager {...props} />}

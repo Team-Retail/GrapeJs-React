@@ -7,6 +7,8 @@ import { Template1, Template2 } from "../utils/template";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL,  } from "../utils/base";
 const saveJsonApiUrl =BASE_URL + "/api/auth/save-json";
+import Icon from '@mdi/react';
+import { mdiLoading, mdiCloudUploadOutline } from '@mdi/js';
 
 type SelectProps ={
   submitForm:()=>Promise<void>
@@ -14,6 +16,8 @@ type SelectProps ={
 
 const Select: React.FC<SelectProps> = ({submitForm}) => {
   const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate()
 
   const handleClick = (frame: string) => {
@@ -21,25 +25,33 @@ const Select: React.FC<SelectProps> = ({submitForm}) => {
   };
 
   const handleButtonClick = async () => {
-    if (!selectedFrame) {
-      alert("select frame")
-    }
-    // @ts-ignore
+    setLoading(true);
 
-    await submitForm()
-
-    const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
-    const response = await axios.post(saveJsonApiUrl, {
-      userId,
-      JSONString: JSON.stringify(selectedFrame === "frame1" ? Template1 : Template2),
-    });
-    if (response.status === 201) {
-      console.log("inside navigate")
-      setTimeout(() => {
-        
-        navigate("/editor")
-      }, 10);
+    try {
+      if (!selectedFrame) {
+        alert("select frame")
+      }
+      // @ts-ignore
+  
+      await submitForm()
+  
+      const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+      const response = await axios.post(saveJsonApiUrl, {
+        userId,
+        JSONString: JSON.stringify(selectedFrame === "frame1" ? Template1 : Template2),
+      });
+      if (response.status === 201) {
+        console.log("inside navigate")
+        setTimeout(() => {
+          
+          navigate("/editor")
+        }, 10);
+      }
+    } catch (error) {
+      console.log(error)
     }
+    setLoading(true);
+
 
   }
 
@@ -67,7 +79,9 @@ const Select: React.FC<SelectProps> = ({submitForm}) => {
         </div>
       </div>
       {selectedFrame && (
-        <button disabled={selectedFrame === null} onClick={handleButtonClick} className=" px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px]">
+        <button disabled={loading || selectedFrame === null} onClick={handleButtonClick} className=" px-[40px] py-[10px] bg-blue-500 text-white font-semibold rounded-[14px] text-[26px] disabled:opacity-70" >
+
+          {loading && <Icon path={mdiLoading} size={1} className={loading ? "animate-spin" : ""} />}
           Continue
         </button>
       )}

@@ -15,6 +15,7 @@ export default function CustomSelectorManager({
   setState,
   addSelector,
   removeSelector,
+  
 }: Omit<SelectorsResultProps, "Container">) {
   const addNewSelector = () => {
     const next = selectors.length + 1;

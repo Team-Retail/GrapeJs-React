@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -7,7 +7,7 @@ import {
   useEditor,
 } from "@grapesjs/react";
 import CustomBlockManager from "./CustomBlockManager.tsx";
-import { BASE_URL } from '../utils/base.ts';
+import { BASE_URL, BASE_URL_PYTHON } from '../utils/base.ts';
 import axios from 'axios';
 import PdfAccordion from './PdfAccordian.tsx';
 
@@ -31,6 +31,10 @@ const SidebarTabComponent = () => {
   const [value, setValue] = useState(0);
   const [assets, setAssets] = useState([]);
   const [expandedAccordion, setExpandedAccordion] = useState<string | false>(false);
+  const [processingSessions, setProcessingSessions] = useState();
+
+  const intervalRef = useRef<any>()
+  const sessionRef = useRef()
 
   const saveData = async () => {
     const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
@@ -48,6 +52,14 @@ const SidebarTabComponent = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+  const getSessionStatus = async () => {
+    const userId = JSON.parse(localStorage.getItem("userDetails"))._id;
+    const response = await axios.get(BASE_URL_PYTHON + "/session_status/" + userId);
+    const arr = response.data.filter(session => !session.completed);
+
+    setProcessingSessions(arr);
+    return arr;
   };
 
   useEffect(() => {
@@ -74,16 +86,37 @@ const SidebarTabComponent = () => {
         setAssets(args.model.models);
       }
     });
+    polling()
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+   
   }, [editor, assets]);
 
+  const polling = async()=>{
+    
+    let arr = await getSessionStatus()
+    if (arr.length > 0) {
+      intervalRef.current = setInterval(() => {
+        arr = getSessionStatus()
+        if(arr.length===0){
+          clearInterval(intervalRef.current);
+        }
+      }, 5000);
+    }
+  }
+
   const pdfAssets = useMemo(() => {
-    return assets.filter(a => !isImage(a.get('src')));
+    // @ts-ignore
+    return assets?.filter(a => !isImage(a.get('src')));
   }, [assets]);
 
 
   const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedAccordion(isExpanded ? panel : false);
   };
+
+  console.log("processing first",sessionRef.current)
 
   return (
     <div className='w-full '>
@@ -116,12 +149,13 @@ const SidebarTabComponent = () => {
         </BlocksProvider>
       ) : (
         <div className='flex flex-col gap-3 py-4'>
-          {pdfAssets.map(item => (
+          {pdfAssets.map((item,index) => (
             <PdfAccordion
               key={item.cid}
               item={item}
               expanded={expandedAccordion === item.cid}
               onChange={handleAccordionChange(item.cid)}
+              processing={processingSessions} 
             />  
           ))}
         </div>
